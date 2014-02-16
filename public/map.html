@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <style>
+      body, html{
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        background-color: black;
+      }
+      water-map{
+        width: 100%;
+        height: 100%;
+        display: block;
+        overflow: hidden;
+        shape-rendering: crispEndges;
+      }
+      water-map circle{
+        opacity: 0.5;
+      }
+      water-map path{
+        fill: none;
+        stroke: #999;
+        opacity: 0.5;
+      }
+      circle{
+        fill: #999;
+      }
+      circle.level{
+        fill: blue;
+      }
+    </style>
+  </head>
+  <body ng-app="myApp" ng-controller="MainCtrl">
+      <water-map 
+          reservoirs="reservoirs"
+          history="history"
+          shapefile="shapefile">
+      </water-map>
+  </body>
+    <script src="d3.js" charset="utf-8"></script>
+    <script src="topojson.v1.js" charset="utf-8"></script>
+    <script src="angular.js"></script>
+    <script>
+var app = angular.module('myApp', [])
+app.controller('MainCtrl', function($scope, $window){
+  angular.element($window).on('resize', function(){ $scope.$apply() })
+  $scope.reservoirs = []
+  d3.csv('data/reservoirs.capacities.csv', function(row){
+    row.elev = Number(row.elev)
+    row.latitude = Number(row.latitude)
+    row.longitude = Number(row.longitude)
+    return row
+  }, function(err, data){
+    if(err) throw err
+    $scope.reservoirs = data
+    $scope.$apply()
+    d3.csv('data/drought.csv', function(row){
+      row.year = Number(row.date.split('/')[1])
+      row.month = Number(row.month)
+      var month = row.month.toString()
+      if(month.length === 1) month = '0' + month
+      row.date = row.year + '-' + month
+      Object.keys(row).forEach(function(header){
+        if(header === 'date' || header === 'month' || header === '') return
+        row[header] = Number(row[header])
+      })
+      return row
+    }, function(err, data){
+      if(err) throw err
+      $scope.history = data
+      $scope.$apply()
+    })
+  })
+  d3.json('data/counties.topojson', function(err, shapefile){
+    if(err) throw err
+    $scope.shapefile = shapefile
+    $scope.$apply()
+  })
+})
+app.directive('waterMap', function(){
+  function link(scope, el, attr){
+    el = el[0]
+    var width, height
+    var svg = d3.select(el).append('svg')
+    var zoomGroup = svg.append('g')
+    var geography = zoomGroup.append('g')
+    var proj = d3.geo.albers()
+    var shapefile
+    var reservoirs = zoomGroup.append('g').attr('class', 'reservoirs')
+      .selectAll('g.reservoir')
+    var radiusToArea = function(r){ return Math.PI * Math.pow(r, 2) }
+    var areaToRadius = function(area){ return Math.sqrt(area / Math.PI) }
+    var capacityScale = d3.scale.linear()
+      .range([0, radiusToArea(30)])
+
+    geography.append('path')
+
+    // resize()
+    function resize(){
+      width = el.clientWidth, height = el.clientHeight
+      svg.attr({width: width, height: height})
+      proj.translate([ width / 2, height / 2])
+        .rotate([120, 1.5, 0])
+        .scale(3000)
+    }
+    scope.$watch(function(){ return el.clientWidth + el.clientHeight }, resize)
+    scope.$watch('reservoirs', function(data){
+      if(!data || !data.length) return
+      var max = d3.max(data, function(d){ return Number(d.capacity) })
+      capacityScale.domain([0, max])
+      reservoirs = reservoirs.data(data)
+      var reservoir = reservoirs.enter().append('g')
+        .attr('class', 'reservoir')
+        .attr('transform', function(d){
+            return 'translate(' + proj([d.longitude, d.latitude]) + ')' 
+        })
+      reservoir.append('circle')
+        .attr('class', 'capacity')
+        .attr('r', function(d){
+          return areaToRadius(capacityScale(d.capacity)) 
+        })
+      reservoir.append('circle')
+        .attr('class', 'level')
+    })
+
+    scope.$watch('history', function(history){
+      if(!history) return
+      var i = 0
+      setInterval(function(){
+        reservoirs.select('.level')
+          .attr('r', function(d){
+            var val = history[i][d.id] || 0
+            return areaToRadius(capacityScale(val))
+          })
+        i++
+      }, 10)
+    })
+
+    scope.$watch('shapefile', update_shapefile)
+    function update_shapefile(_){
+      if(!_) return
+      shapefile = _
+      geography.select('path')
+        .datum(topojson.feature(shapefile, shapefile.objects.counties))
+        .attr('d', d3.geo.path().projection(proj))
+    }
+
+  }
+  return {
+    link: link, restrict: 'E', scope: {reservoirs: '=', shapefile: '=', history: '='}
+  }
+})
+    </script>
+    <script src="directives/stacked-bar-chart.js" charset="utf-8"></script>
+</html>

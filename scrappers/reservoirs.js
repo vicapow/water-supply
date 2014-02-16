@@ -22,12 +22,17 @@ request.get({
     var td = $(el).find('td')
     if(td.length === 1) return region = td.text()
     if(td.length !== 7) return // the header
-    var row = []
+    var row = [], skip = false
     td.each(function(i, el){
-      row.push($(el).text().replace(/\s+$/,'').replace(/^\s+/,''))
+      var val = $(el).text().replace(/\s+$/,'').replace(/^\s+/,'')
+      // cdec gives non-negative longitude...
+      if(headers[i] === 'longitude') val = '-' + val
+      // SJT. it's not a real station (UPPER SAN JOAQUIN TOTAL)
+      if(headers[i] === 'id' && val === 'SJT') skip = true
+      row.push(val)
     })
     row.push(region)
-    rows.push(row)
+    if(!skip) rows.push(row)
   })
   // console.log(rows)
   rows.unshift(headers)

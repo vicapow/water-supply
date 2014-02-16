@@ -28,6 +28,9 @@ Related articles
     - this business week article is also the source of the drought.xlsx file
 
 
+shapefile source:
+  http://scec.usc.edu/internships/useit/content/california-counties-shapefiles
+
 Average per capita urban water use by hydrologic region, 2005
 
 original image: https://watershed.ucdavis.edu/myths/the+southern+california+water+villain/2-lg.gif
