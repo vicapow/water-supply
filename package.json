@@ -1,0 +1,17 @@
+{
+  "name": "water-supply",
+  "version": "0.0.0",
+  "description": "water sources & supply",
+  "main": "index.js",
+  "dependencies": {
+    "request": "~2.33.0",
+    "cheerio": "~0.13.1",
+    "csv": "~0.3.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Victor Powell",
+  "license": "BSD-2-Clause"
+}
