@@ -54,7 +54,7 @@ app.directive('waterMap', function(){
       if(scope.history === undefined || scope.now === undefined) return
       if(!scope.history.length) return
       reservoirs.select('.level')
-        .transition().duration(250)
+        .transition().duration(500)
         .ease('linear')
         .attr('r', function(d){
           var val = scope.history[scope.now].reservoirs[d.id] || 0

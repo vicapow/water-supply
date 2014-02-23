@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'> -->
     <title></title>
     <style>
       html, body{
@@ -19,20 +19,34 @@
         height: 100%;
         display: block;
         overflow: hidden;
-        shape-rendering: crispEndges;
       }
       water-map circle{
         opacity: 0.5;
+        -webkit-transition: all .25s;
+        -moz-transition: all .25s;
+        transition: all .25s;
       }
+/*      water-map circle:hover{
+        opacity: 1;
+      }*/
       water-map path{
         fill: none;
-        stroke: #999;
-        opacity: 0.5;
+        stroke: black;
+        opacity: 0.3;
+        /*shape-rendering: crispEndges;*/
       }
-      circle{
+      whater-map path{
+        fill: green;
+        stroke: green;
+      }
+      water-map .reservoirs{
+        cursor: pointer;
+      }
+      water-map circle{
         fill: #999;
       }
       circle.level{
+        /*fill: #3498db;*/
         fill: blue;
       }
       input[type="range"]{
@@ -50,12 +64,19 @@
       .detail{
         position: absolute;
         width: 400px;
-        top: 90px;
+        top: 120px;
         right: 0;
       }
       .detail .title{
         text-align: left;
+        padding-left: 60px;
         font-size: 20px;
+        margin: 0;
+      }
+      .detail p{
+        text-align: left;
+        padding-left: 60px;
+        margin: 0;
       }
       reservoir-detail{
         width: 400px;
@@ -65,7 +86,6 @@
         box-sizing: border-box;
       }
       reservoir-detail .years line{
-        stroke: #444;
         shape-rendering: crispEdges;
       }
       reservoir-detail .years{
@@ -84,20 +104,66 @@
         fill: black;
         stroke: none;
       }
+      reservoir-detail path, reservoir-detail line{
+        stroke: rgba(0, 0, 0, 0.2);
+      }
       reservoir-detail rect{
         fill: blue;
         opacity: 0.8;
       }
-      water-map .reservoirs{
+      scale-slider{
+        width: 100%;
+        height: 40px;
+        display: block;
+        shape-rendering: crispEdges;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      scale-slider svg{
+        display: block;
+        stroke: black;
         cursor: pointer;
+      }
+      scale-slider text{
+        font-size: 8px;
+        stroke: none;
+      }
+      scale-slider path{
+        fill: none;
+      }
+      scale-slider path, scale-slider line{
+        stroke: rgba(0, 0, 0, 0.2);
+      }
+      scale-slider circle.nob{
+        shape-rendering: geometricPrecision;
+        stroke: #888;
+        fill: white;
+        cursor: pointer;
+      }
+      scale-slider circle.shadow{
+        opacity: 0.1;
+      }
+      div.play-btn{
+        border: 1px solid #aaa;
+        background-color: white;
+        color: #777;
+        font-weight: 100;
+        padding: 5px;
+        margin: 5px;
+        box-sizing: border-box;
+        border-radius: 5px;
+        cursor: pointer;
+        /*font-size: 10px;*/
+        box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+        display: inline-block;
+        -webkit-user-select: none;
       }
     </style>
   </head>
   <body ng-app="myApp" ng-controller="MainCtrl">
     <div class="map-container">
-      <h2>{{ year }} - {{ month }}</h2>
-      <button ng-model="playing" ng-click="playing = !playing">{{ playing ? 'pause' : 'play' }}</button>
-      <input type="range" ng-model="now" min="0" max="{{history.length - 1}}">
+      <p><div class="play-btn" ng-model="playing" ng-click="playing = !playing">{{ playing ? 'pause' : 'play' }}</div> {{ year }} - {{ months[month] }}</p>
+      <scale-slider domain="domain" now="sliderPosition"></scale-slider>
       <water-map
         reservoirs="reservoirs"
         history="history"
@@ -107,7 +173,8 @@
       </water-map>
       <div class="detail">
         <h1 class="title"> {{reservoir.station}}</h1>
-        <span>{{reservoir.capacity }}</span>
+        <p>storage: {{formatCapacity(history[now].reservoirs[reservoir.id])}} AF<br>
+          capacity: {{formatCapacity(reservoir.capacity)}} AF</p>
         <reservoir-detail reservoir="reservoir" year="year" month="month"></reservoir-detail>
       </div>
     </div>
@@ -129,8 +196,15 @@ app.controller('MainCtrl', function($scope, $window, $interval){
   $scope.reservoirs = []
   $scope.reservoir
   $scope.now = 0
+  var capacity_format = d3.format('.3s')
+  $scope.formatCapacity = function(capacity){
+    return capacity_format(capacity)
+  }
+  $scope.months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August']
+    .concat(['September', 'October', 'November', 'December'])
   $scope.playing = false
   var interval
+  $scope.sliderPosition = null
   $scope.$watch('playing', function(playing){
     if(playing){
       var prev_now = $scope.now
@@ -145,18 +219,28 @@ app.controller('MainCtrl', function($scope, $window, $interval){
         $scope.now++
         if($scope.now >= $scope.history.length) $scope.now = 0
         prev_now = $scope.now
-      }, 500)
+      }, 500 )
     }else{
       $interval.cancel(interval)
     }
   })
-  $scope.$watch('now', update_month_year)
-  function update_month_year(){
-    var now = $scope.now
-    if(!$scope.history) return
-    $scope.year = $scope.history[now].year
-    $scope.month = $scope.history[now].month
+  $scope.$watch('now', now_change)
+  function now_change(){
+    var now = $scope.now, history = $scope.history
+    if(!history) return
+    $scope.year = history[now].year
+    $scope.month = history[now].month
+    $scope.sliderPosition = new Date(history[now].date)
   }
+  $scope.$watch('sliderPosition', function(date){
+    if(!date) return
+    var month = date.getUTCMonth() + 1 + ''
+    if(month.length === 1) month = '0' + month
+    date = date.getUTCFullYear() + '-' + month
+    var now = 0, history = $scope.history
+    while(history[now].date !== date && now < history.length) now++
+    $scope.now = now
+  })
   $scope.maxReservoir = function(reservoir){
     if(!reservoir) return
     return d3.max(reservoir.data, function(d){
@@ -211,7 +295,8 @@ app.controller('MainCtrl', function($scope, $window, $interval){
         // just just data for the last 5 years
         history = history.filter(function(d){ return d.year >= 2010 })
         $scope.history = history
-        update_month_year()
+        $scope.domain = [history[0].date, history[history.length - 1].date]
+        now_change()
         $scope.reservoirs = reservoirs
           .map(function(reservoir){
             // get _all_ the historic data for this reservoir
@@ -240,4 +325,5 @@ app.controller('MainCtrl', function($scope, $window, $interval){
     <script src="directives/bar-chart.js"></script>
     <script src="directives/water-map.js"></script>
     <script src="directives/reservoir-detail.js"></script>
+    <script src="directives/scale-slider.js"></script>
 </html>

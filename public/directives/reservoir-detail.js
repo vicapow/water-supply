@@ -29,7 +29,7 @@ app.directive('reservoirDetail', function(){
         .attr('cy', function(d){ return d[1] })
       x.rangeRoundBands([0, 230], 0, 0), y.range([yearHeight, 0])
       axisG.call(axis.scale(x))
-        .attr('transform', 'translate(' + [0, 200] + ')')
+        .attr('transform', 'translate(' + [0, 190] + ')')
     }
 
     scope.$watch('reservoir', function(reservoir){
@@ -47,7 +47,7 @@ app.directive('reservoirDetail', function(){
             .attr('x', 250).attr('y', 35)
         })
         .call(function(year){
-          year.append('line').attr('x1', 0).attr('x2', 230)
+          year.append('line').attr('x1', -5).attr('x2', 230 + 5)
             .attr('y1', yearHeight).attr('y2', yearHeight)
         })
       var spacing = 10
