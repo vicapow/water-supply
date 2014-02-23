@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'> -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <title></title>
     <style>
       html, body{
@@ -95,7 +95,8 @@
   </head>
   <body ng-app="myApp" ng-controller="MainCtrl">
     <div class="map-container">
-      <h2>{{ year }} - {{ month }} </h2><button ng-model="playing" ng-click="playing = !playing">{{ playing ? 'pause' : 'play' }}</button>
+      <h2>{{ year }} - {{ month }}</h2>
+      <button ng-model="playing" ng-click="playing = !playing">{{ playing ? 'pause' : 'play' }}</button>
       <input type="range" ng-model="now" min="0" max="{{history.length - 1}}">
       <water-map
         reservoirs="reservoirs"
