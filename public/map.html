@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'> -->
     <title></title>
     <style>
-      body, html{
+      html, body{
         width: 100%;
         height: 100%;
+      }
+      body{
         margin: 0;
-        background-color: black;
+        background-color: white;
+        color: black;
+        font-family: 'Open Sans', sans-serif;
       }
       water-map{
         width: 100%;
@@ -30,47 +35,198 @@
       circle.level{
         fill: blue;
       }
+      input[type="range"]{
+        width: 100%;
+      }
+      .map-container{
+        /*border: 1px solid rgba(255, 0, 0, 1);*/
+        margin: auto;
+        display: block;
+        width: 700px;
+        height: 700px;
+        position: relative;
+        box-sizing: border-box;
+      }
+      .detail{
+        position: absolute;
+        width: 400px;
+        top: 90px;
+        right: 0;
+      }
+      .detail .title{
+        text-align: left;
+        font-size: 20px;
+      }
+      reservoir-detail{
+        width: 400px;
+        height: 300px;
+        display: block;
+        /*border: 1px solid red;*/
+        box-sizing: border-box;
+      }
+      reservoir-detail .years line{
+        stroke: #444;
+        shape-rendering: crispEdges;
+      }
+      reservoir-detail .years{
+        font-size: 14px;
+      }
+      reservoir-detail .axis-x{
+        font-size: 8px;
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+      }
+      reservoir-detail .axis-x path{
+        stroke: none;
+      }
+      reservoir-detail .axis-x text{
+        fill: black;
+        stroke: none;
+      }
+      reservoir-detail rect{
+        fill: blue;
+        opacity: 0.8;
+      }
+      water-map .reservoirs{
+        cursor: pointer;
+      }
     </style>
   </head>
   <body ng-app="myApp" ng-controller="MainCtrl">
-      <water-map 
-          reservoirs="reservoirs"
-          history="history"
-          shapefile="shapefile">
+    <div class="map-container">
+      <h2>{{ year }} - {{ month }} </h2><button ng-model="playing" ng-click="playing = !playing">{{ playing ? 'pause' : 'play' }}</button>
+      <input type="range" ng-model="now" min="0" max="{{history.length - 1}}">
+      <water-map
+        reservoirs="reservoirs"
+        history="history"
+        now="now"
+        selected-reservoir="reservoir"
+        shapefile="shapefile">
       </water-map>
+      <div class="detail">
+        <h1 class="title"> {{reservoir.station}}</h1>
+        <span>{{reservoir.capacity }}</span>
+        <reservoir-detail reservoir="reservoir" year="year" month="month"></reservoir-detail>
+      </div>
+    </div>
   </body>
     <script src="d3.js" charset="utf-8"></script>
     <script src="topojson.v1.js" charset="utf-8"></script>
     <script src="angular.js"></script>
     <script>
 var app = angular.module('myApp', [])
-app.controller('MainCtrl', function($scope, $window){
+app.filter('reverse', function() {
+  return function(items) {
+    if (!angular.isArray(items)) return false
+    return items.slice().reverse()
+  }
+})
+app.controller('MainCtrl', function($scope, $window, $interval){
+  $scope.d3 = d3
   angular.element($window).on('resize', function(){ $scope.$apply() })
   $scope.reservoirs = []
+  $scope.reservoir
+  $scope.now = 0
+  $scope.playing = false
+  var interval
+  $scope.$watch('playing', function(playing){
+    if(playing){
+      var prev_now = $scope.now
+      interval = $interval(function(){
+        if($scope.now !== prev_now){
+          // something other than this timer updated `now`. we should stop
+          // auto playing
+          $interval.cancel(interval)
+          $scope.playing = false
+          return
+        }
+        $scope.now++
+        if($scope.now >= $scope.history.length) $scope.now = 0
+        prev_now = $scope.now
+      }, 500)
+    }else{
+      $interval.cancel(interval)
+    }
+  })
+  $scope.$watch('now', update_month_year)
+  function update_month_year(){
+    var now = $scope.now
+    if(!$scope.history) return
+    $scope.year = $scope.history[now].year
+    $scope.month = $scope.history[now].month
+  }
+  $scope.maxReservoir = function(reservoir){
+    if(!reservoir) return
+    return d3.max(reservoir.data, function(d){
+      return d3.max(d.values, function(d){ return d.value })
+    })
+  }
   d3.csv('data/reservoirs.capacities.csv', function(row){
     row.elev = Number(row.elev)
     row.latitude = Number(row.latitude)
     row.longitude = Number(row.longitude)
+    row.capacity = Number(row.capacity)
+    // convert station names to sentence case instead of all caps
+    row.station = row.station.split(' ').map(function(word){
+      return word.toLowerCase().split('').map(function(l, i){
+        if(i === 0) return l.toUpperCase(); return l
+      }).join('')
+    }).join(' ')
     return row
-  }, function(err, data){
+  }, function(err, reservoirs){
     if(err) throw err
-    $scope.reservoirs = data
-    $scope.$apply()
-    d3.csv('data/drought.csv', function(row){
+    $scope.$apply(function(){
+      $scope.reservoirs = reservoirs
+      $scope.reservoir = reservoirs[6]
+    })
+    d3.csv('data/drought.csv', function(row, i){
+      delete row[''] // get rid of this empty column property
       row.year = Number(row.date.split('/')[1])
       row.month = Number(row.month)
       var month = row.month.toString()
       if(month.length === 1) month = '0' + month
       row.date = row.year + '-' + month
+      var obj = {} // temp object to hold reservoir data
       Object.keys(row).forEach(function(header){
-        if(header === 'date' || header === 'month' || header === '') return
-        row[header] = Number(row[header])
+        var non_reservoir_headers = ['date', 'month', 'year', '', 'capacity']
+        if(non_reservoir_headers.indexOf(header) !== -1) return
+        // convert to numbers and namespace the reservoirs
+        obj[header] = Number(row[header])
+        delete row[header]
       })
+      row.reservoirs = obj
+      /*
+      row === {
+        date:, month:, year:, reservoirs: {sha:10, led:30, ...}
+      }
+      */
       return row
-    }, function(err, data){
+    }, function(err, history){
       if(err) throw err
-      $scope.history = data
-      $scope.$apply()
+      $scope.$apply(function(){
+        $scope.now = 0
+        $scope.playing = true
+        // just just data for the last 5 years
+        history = history.filter(function(d){ return d.year >= 2010 })
+        $scope.history = history
+        update_month_year()
+        $scope.reservoirs = reservoirs
+          .map(function(reservoir){
+            // get _all_ the historic data for this reservoir
+            var data = history.map(function(step){
+              return {
+                  value: step.reservoirs[reservoir.id]
+                , year: step.year
+                , month: step.month
+              }
+            })
+            // group the historic data by year
+            var data = d3.nest().key(function(d){ return d.year }).entries(data)
+            reservoir.data = data
+            return reservoir
+          })
+      })
     })
   })
   d3.json('data/counties.topojson', function(err, shapefile){
@@ -79,79 +235,8 @@ app.controller('MainCtrl', function($scope, $window){
     $scope.$apply()
   })
 })
-app.directive('waterMap', function(){
-  function link(scope, el, attr){
-    el = el[0]
-    var width, height
-    var svg = d3.select(el).append('svg')
-    var zoomGroup = svg.append('g')
-    var geography = zoomGroup.append('g')
-    var proj = d3.geo.albers()
-    var shapefile
-    var reservoirs = zoomGroup.append('g').attr('class', 'reservoirs')
-      .selectAll('g.reservoir')
-    var radiusToArea = function(r){ return Math.PI * Math.pow(r, 2) }
-    var areaToRadius = function(area){ return Math.sqrt(area / Math.PI) }
-    var capacityScale = d3.scale.linear()
-      .range([0, radiusToArea(30)])
-
-    geography.append('path')
-
-    // resize()
-    function resize(){
-      width = el.clientWidth, height = el.clientHeight
-      svg.attr({width: width, height: height})
-      proj.translate([ width / 2, height / 2])
-        .rotate([120, 1.5, 0])
-        .scale(3000)
-    }
-    scope.$watch(function(){ return el.clientWidth + el.clientHeight }, resize)
-    scope.$watch('reservoirs', function(data){
-      if(!data || !data.length) return
-      var max = d3.max(data, function(d){ return Number(d.capacity) })
-      capacityScale.domain([0, max])
-      reservoirs = reservoirs.data(data)
-      var reservoir = reservoirs.enter().append('g')
-        .attr('class', 'reservoir')
-        .attr('transform', function(d){
-            return 'translate(' + proj([d.longitude, d.latitude]) + ')' 
-        })
-      reservoir.append('circle')
-        .attr('class', 'capacity')
-        .attr('r', function(d){
-          return areaToRadius(capacityScale(d.capacity)) 
-        })
-      reservoir.append('circle')
-        .attr('class', 'level')
-    })
-
-    scope.$watch('history', function(history){
-      if(!history) return
-      var i = 0
-      setInterval(function(){
-        reservoirs.select('.level')
-          .attr('r', function(d){
-            var val = history[i][d.id] || 0
-            return areaToRadius(capacityScale(val))
-          })
-        i++
-      }, 10)
-    })
-
-    scope.$watch('shapefile', update_shapefile)
-    function update_shapefile(_){
-      if(!_) return
-      shapefile = _
-      geography.select('path')
-        .datum(topojson.feature(shapefile, shapefile.objects.counties))
-        .attr('d', d3.geo.path().projection(proj))
-    }
-
-  }
-  return {
-    link: link, restrict: 'E', scope: {reservoirs: '=', shapefile: '=', history: '='}
-  }
-})
     </script>
-    <script src="directives/stacked-bar-chart.js" charset="utf-8"></script>
+    <script src="directives/bar-chart.js"></script>
+    <script src="directives/water-map.js"></script>
+    <script src="directives/reservoir-detail.js"></script>
 </html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <style>
+      body, html{
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+      stacked-bar-chart{
+        width: 100%;
+        height: 20px;
+        display: block;
+        overflow: hidden;
+        padding-left: 1px;
+        padding-right: 1px;
+        box-sizing: border-box;
+      }
+      h1{
+        margin: 0;
+        padding: 0;
+      }
+      .reservoir{
+        width: 40px;
+        float: left;
+      }
+    </style>
+  </head>
+  <body ng-app="myApp" ng-controller="MainCtrl">
+    <div ng-repeat="reservoir in reservoirs" class="reservoir">
+      <h1> {{reservoir.name}} </h1>
+      <stacked-bar-chart data="[year]" max="max" ng-repeat="year in reservoir.years"></stacked-bar-chart>
+    </div>
+    <div style="clear:both">
+    <br>
+    <pre>{{ reservoirs | json }}</pre>
+    <label>max</label><pre>{{max}}</pre>
+  </body>
+    <script src="/d3.js" charset="utf-8"></script>
+    <script src="/angular.js"></script>
+    <script>
+var app = angular.module('myApp', [])
+app.controller('MainCtrl', function($scope, $window){
+  var past_years = 8
+  angular.element($window).on('resize', function(){ $scope.$apply() })
+  $scope.reservoirs = []
+  d3.csv('/data/drought.csv', function(row){
+    row.year = Number(row.date.split('/')[1])
+    row.month = Number(row.month)
+    var month = row.month.toString()
+    if(month.length === 1) month = '0' + month
+    row.date = row.year + '-' + month
+    Object.keys(row).forEach(function(header){
+      if(header === 'date' || header === 'month' || header === '') return
+      row[header] = Number(row[header])
+    })
+    return row
+  }, function(err, data){
+    if(err) throw err
+    // format the layers
+    function stackedData(reservoirs){
+      return reservoirs.map(function(name){
+        return {
+            name: name
+          , values: data.filter(function(row){
+            return true // dont filter
+            // return row.date >= '2013-01'
+          }).map(function(row){ return { x: row.date, y: row[name] } })
+        }
+      })
+    }
+    // reservoir names
+    var names = Object.keys(data[0])
+      .filter(function(name){
+        return name !== 'date' && name !== 'month' && name !== 'year' })
+    $scope.reservoirs = names.map(function(name){
+      var data = stackedData([name])[0]
+      var years = [], prev_year, cur_year
+      data.values.forEach(function(d){
+        var year = d.x.split('-')[0] // string year
+        if(year !== prev_year){
+          prev_year = year
+          cur_year = []
+          years.push({ name: year, values: cur_year})
+        }
+        cur_year.push({ x: Number(d.x.split('-')[1]), y: d.y })
+      })
+      while(cur_year.length < 12) cur_year.push({ x: cur_year.length + 1, y: 0})
+      return { name: name, years: years }
+    })
+    // $scope.reservoirs = $scope.reservoirs.slice(0, 1)
+    $scope.reservoirs.map(function(reservoir){
+      reservoir.years = reservoir.years.splice(-past_years, past_years).reverse()
+    })
+
+    $scope.reservoirs.sort(function(a, b){
+      var a = d3.max(a.years, function(y){ return d3.max(y.values, function(d){ return d.y })})
+      var b = d3.max(b.years, function(y){ return d3.max(y.values, function(d){ return d.y })})
+      return b - a
+    })
+
+    $scope.max = d3.max($scope.reservoirs, function(reservoir){
+      return d3.max(reservoir.years, function(year){
+        return d3.max(year.values, function(value){ return value.y })
+      })
+    })
+    $scope.$apply()
+  })
+})
+    </script>
+    <script src="/directives/stacked-bar-chart.js" charset="utf-8"></script>
+</html>

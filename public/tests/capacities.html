@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <style>
+      body, html{
+        margin: 0;
+        width: 100%;
+        height: 100%;
+      }
+      force-layout{
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        display: block;
+      }
+      circle{
+        stroke: red;
+        stroke-width: 10;
+      }
+    </style>
+  </head>
+  <body ng-app="app" ng-controller="MainCtrl">
+    <force-layout data="data" value="d.capacity" max-radius="radius" running="running">
+    </force-layout>
+    <pre>{{ data.length | json }}</pre>
+    <script src="/d3.js" charset="utf-8"></script>
+    <script src="/angular.js" charset="utf-8"></script>
+    <script>
+
+var app = angular.module('app', [])
+
+app.controller('MainCtrl', function($scope, $window){
+  function radius(){ return Math.min($window.innerWidth, $window.innerHeight) / 10 }
+  $scope.radius = radius()
+  angular.element($window).on('resize', function(){ 
+    $scope.$apply()
+    $scope.radius = radius()
+    $scope.running = true
+  })
+  d3.csv('/data/reservoirs.capacities.csv', function(row){
+    row.capacity = Number(row.capacity)
+    return row
+  }, function(err, data){
+    if(err) throw err
+    $scope.$apply(function(){
+      $scope.data  = data
+    })
+  })
+})
+
+app.directive('forceLayout',function(){
+  function link(scope, el, attr){
+    el = el[0]
+    var w = el.clientWidth, h = el.clientHeight
+    var svg = d3.select(el).append('svg')
+      .attr({width: w, height: h })
+    var data = d3.range(10).map(function(i){ return { index: i, weight: 1 } })
+    var force = d3.layout.force().nodes(data)
+    var scale_factor
+    var max_radius
+    var nodes = svg.selectAll("circle")
+    force.size([w, h]).start()
+    force.on('tick', function(d){
+      update_node_positions()
+    })
+
+    scope.$watch(function(){
+      return w = el.clientWidth, h = el.clientHeight, w + h
+    }, update_size)
+
+    scope.$watch('running', function(running){
+      if(running) force.start()
+      else force.stop()
+    })
+
+    function update_size(){
+       svg.attr({width: w, height: h})
+       force.size([w, h]).start()
+    }
+    
+    scope.$watch('maxRadius', function(){
+      max_radius = scope.maxRadius
+      update_scale_factor()
+    })
+    function update_scale_factor(){
+      if(!scope.data || !scope.data.length) return
+      var max_val = d3.max(scope.data, function(d){ return scope.value({d: d})})
+      scale_factor = max_radius / max_val
+      if(!scale_factor) return
+      update_node_sizes()
+      force.charge(function(d){
+        return - scope.value({d: d}) * scale_factor * 15
+      }).start()
+    }
+    scope.$watch('data', function(){
+      if(!scope.data) return
+      nodes = svg.selectAll("circle").data(scope.data)
+      nodes.enter().append("circle")
+      nodes.exit().remove()
+      force.nodes(scope.data).start()
+      if(!scale_factor) update_scale_factor()
+      update_node_sizes()
+    })
+    function update_node_sizes(){
+      nodes.attr("r", function(d){ return scope.value({d: d}) * scale_factor })
+    }
+    function update_node_positions(){
+      nodes.attr({ cx: function(d){ return d.x }, cy: function(d){ return d.y } })
+    }
+  }
+  return {
+    link: link, restrict: 'E'
+    , scope: { data: '=', value: '&', maxRadius: '=' }
+  }
+})
+    </script>
+  </body>
+</html>

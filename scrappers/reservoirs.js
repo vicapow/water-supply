@@ -4,7 +4,7 @@ var request = require('request')
 var cheerio = require('cheerio')
 var csv = require('csv')
 
-
+// this url provides the lat and long data for each of the reservoirs
 request.get({
   url: 'http://cdec.water.ca.gov/misc/daily_res.html'
 }, function(err, res, body){

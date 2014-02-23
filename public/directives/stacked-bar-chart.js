@@ -43,21 +43,24 @@ app.directive('stackedBarChart', function(){
       })
     }
 
-    scope.$watch('data', update, true)
-    // update the `values` accessor
+    scope.$watch('data', update_layers, true)
+    
+    // watch the `values` accessor
     scope.$watch('values', function(values){
       if(!values) return
       stack.values(values)
-      update()
+      update_layers()
     })
     // update the `x` accessor
-    scope.$watch('x', function(x){ if(!x) return; stack.x(x); update() })
-    scope.$watch('y', function(y){ if(!y) return; stack.y(y); update() })
+    scope.$watch('x', function(x){ if(!x) return; stack.x(x); update_layers() })
+    scope.$watch('y', function(y){ if(!y) return; stack.y(y); update_layers() })
     // TODO: optimization - combine these three accessor watches into a single 
     // watch.
-    function update(){
-      if(!scope.data || !scope.data.length) return
-      layerData = stack(scope.data)
+    function update_layers(){
+      var data = scope.data
+      if(!data) return
+      if(!(data instanceof Array)) data = [data]
+      layerData = stack(data)
       var last = layerData[layerData.length - 1]
       var max = scope.max || d3.max(layerData, function(layer){
         return d3.max(layer.values, function(d){ return d.y + d.y0 })

@@ -1,5 +1,8 @@
 # Notes and data on California water supply
 
+reservoir data
+http://cdec.water.ca.gov/cgi-progs/current/RES
+
 water sources & supply
   
   + source: https://newsline.llnl.gov/articles/2008/jul/07.25.08_water.php
