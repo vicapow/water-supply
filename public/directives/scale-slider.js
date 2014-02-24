@@ -6,10 +6,10 @@ app.directive('scaleSlider', function(){
     var axis = d3.svg.axis()
       .innerTickSize(5)
       // .tickFormat(function(d, i){ return months[d.getUTCMonth()] })
-    var clickRect = svg.append('rect')
     var axisG = svg.append('g')
     var progressBar = svg.append('rect').attr('class', 'progress-bar')
     var nobG = svg.append('g'), nob_pos = [0, 0]
+    var clickRect = svg.append('rect')
     scope.scale = scope.scale || d3.time.scale.utc()
     var dragging = false
     nobG.append('circle').attr('r', 6).attr('cx', 1).attr('cy', 1).attr('class', 'shadow')
