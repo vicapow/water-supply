@@ -19,16 +19,8 @@
         height: 100%;
         display: block;
         overflow: hidden;
+        cursor: pointer;
       }
-      water-map circle{
-        opacity: 0.5;
-        -webkit-transition: all .25s;
-        -moz-transition: all .25s;
-        transition: all .25s;
-      }
-/*      water-map circle:hover{
-        opacity: 1;
-      }*/
       water-map path{
         fill: none;
         stroke: black;
@@ -42,13 +34,26 @@
       water-map .reservoirs{
         cursor: pointer;
       }
-      water-map circle{
-        fill: #999;
+      water-map circle.capacity{
+        stroke: rgba(0, 0, 0, 0.5);
+        stroke-width: 1;
+        opacity: 1;
+        fill: rgba(0, 0, 0, 0.1);
       }
-      circle.level{
+      water-map circle.level{
         /*fill: #3498db;*/
         fill: blue;
+        pointer-events: none;
       }
+      water-map circle.capacity{
+        opacity: 0.5;
+        -webkit-transition: all .25s;
+        -moz-transition: all .25s;
+        transition: all .25s;
+      }
+/*      water-map circle.capacity:hover{
+        opacity: 1;
+      }*/
       input[type="range"]{
         width: 100%;
       }
@@ -173,8 +178,8 @@
       </water-map>
       <div class="detail">
         <h1 class="title"> {{reservoir.station}}</h1>
-        <p>storage: {{formatCapacity(history[now].reservoirs[reservoir.id])}} AF<br>
-          capacity: {{formatCapacity(reservoir.capacity)}} AF</p>
+        <p>storage: {{formatCapacity(history[now].reservoirs[reservoir.id])}}<br>
+          capacity: {{formatCapacity(reservoir.capacity)}}</p>
         <reservoir-detail reservoir="reservoir" year="year" month="month"></reservoir-detail>
       </div>
     </div>
@@ -198,7 +203,8 @@ app.controller('MainCtrl', function($scope, $window, $interval){
   $scope.now = 0
   var capacity_format = d3.format('.3s')
   $scope.formatCapacity = function(capacity){
-    return capacity_format(capacity)
+    if(isNaN(capacity)) return 'NA'
+    return capacity_format(capacity) + ' AF'
   }
   $scope.months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August']
     .concat(['September', 'October', 'November', 'December'])
@@ -300,18 +306,20 @@ app.controller('MainCtrl', function($scope, $window, $interval){
         $scope.reservoirs = reservoirs
           .map(function(reservoir){
             // get _all_ the historic data for this reservoir
-            var data = history.map(function(step){
-              return {
-                  value: step.reservoirs[reservoir.id]
-                , year: step.year
-                , month: step.month
-              }
-            })
+            var data = []
+            if(history[0].reservoirs[reservoir.id])
+              data = history.map(function(step){
+                return {
+                    value: step.reservoirs[reservoir.id]
+                  , year: step.year
+                  , month: step.month
+                }
+              })
             // group the historic data by year
             var data = d3.nest().key(function(d){ return d.year }).entries(data)
             reservoir.data = data
             return reservoir
-          })
+          }).filter(function(d){ return d.data.length })
       })
     })
   })
