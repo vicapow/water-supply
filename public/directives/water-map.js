@@ -9,7 +9,7 @@ app.directive('waterMap', function(){
     var shapefile
     var reservoirs = zoomGroup.append('g').attr('class', 'reservoirs')
       .selectAll('g.reservoir')
-    var clickRegions = svg.append('g')
+    var clickRegions = svg.append('g').attr('class', 'click-region')
     var radiusToArea = function(r){ return Math.PI * Math.pow(r, 2) }
     var areaToRadius = function(area){ return Math.sqrt(area / Math.PI) }
     var capacityScale = d3.scale.linear()

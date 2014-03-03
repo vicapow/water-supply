@@ -60,3 +60,5 @@ possible data sources
   + reservoir supply
   + water transfers?
 
+
+land sat imagery: http://landsatlook.usgs.gov/
