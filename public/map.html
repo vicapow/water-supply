@@ -165,6 +165,14 @@
         display: inline-block;
         -webkit-user-select: none;
       }
+
+      water-map .reservoirs .reservoir *{
+        vector-effect: non-scaling-stroke;
+      }
+      water-map .reservoirs .reservoir.hover .level{
+        opacity: 0.4;
+      }
+
     </style>
   </head>
   <body ng-app="myApp" ng-controller="MainCtrl">

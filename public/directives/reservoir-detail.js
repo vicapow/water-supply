@@ -7,10 +7,6 @@ app.directive('reservoirDetail', function(){
     var x = d3.scale.ordinal().domain(d3.range(1, 13)), y = d3.scale.linear()
     var axis = d3.svg.axis().tickFormat(function(d){ return months[d] })
     var svg = d3.select(el).append('svg')
-    
-    // for debugging
-    // svg.selectAll('circle').data(d3.range(4)).enter()
-    //   .append('circle').attr('r', 10)
 
     var years = svg.append('g').attr('class', 'years')
       .attr('transform', 'translate(' + [65, 0] + ')')
@@ -57,9 +53,11 @@ app.directive('reservoirDetail', function(){
       var rect = year.selectAll('rect').data(function(d){ return d.values })
       rect.exit().remove()
       rect.enter().append('rect')
+        .on('click', function(d){
+          console.log(d)
+        })
       // `data` is an array of each year, in { key: '1992', values: [...] } form
-      rect
-        .transition()
+      rect.transition()
         .attr('x', function(d, i){ return x(d.month) })
         .attr('y', function(d, i){ return y(d.value) })
         .attr('width', x.rangeBand())
