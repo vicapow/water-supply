@@ -205,6 +205,15 @@
   </head>
   <body ng-app="myApp" ng-controller="MainCtrl">
     <h1> Historic California Reservoir Capacities</h1>
+    <p>
+      Typically, the winter months, December, January, and February, are the time California collects the bulk of its water supply from rain and snow fall. This water is collected into California's many reservoirs for storage. However, the past few years has seen particularly low precipitation. 2012 was the states 12th driest year on record; 2013, the 11th.
+    </p>
+    <p>
+      The typical ebb and flow of these reservoirs is to fill up in the winter from rain and snowfall runoff and slowly deplete over the summer. However, as the visualization below illustrates, several major reservoirs are already at their lowest capacity across a five year span.
+    </p>
+    <p>
+      Control the current date by clicking and dragging on the timeline nob. Change the selected reservoir by clicking on a different reservoir in the map.
+    </p>
     <div class="map-container">
       <p><div class="play-btn" ng-model="playing" ng-click="playing = !playing">{{ playing ? 'pause' : 'play' }}</div> {{ year }} - {{ months[month] }}</p>
       <scale-slider domain="domain" now="sliderPosition"></scale-slider>

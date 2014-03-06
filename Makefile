@@ -18,7 +18,7 @@ public/data/counties.json: California\ County\ Shape\ Files/County/CaliforniaCou
 	California\ County\ Shape\ Files/County/CaliforniaCounty.shp
 
 public/data/counties.topojson: public/data/counties.json
-	topojson -o public/data/counties.topojson public/data/counties.json
+	topojson --ignore-shapefile-properties -o public/data/counties.topojson public/data/counties.json
 
 public/data/reservoirs.capacities.csv: public/data/reservoirs.csv scrappers/capacities.js
 	node scrappers/capacities.js

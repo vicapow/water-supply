@@ -136,20 +136,22 @@ app.directive('waterMap', function(){
 
     function shrink_hovered_reservoir(){
       if(!hovered_reservoir) return
-      var el = d3.select(hovered_reservoir)
-      var d = el.datum()
-      el.classed('hover', false).select('.scale')
+      var sel = d3.select(hovered_reservoir)
+      var d = sel.datum()
+      if(sel.classed('selected')) return
+      sel.classed('hover', false).select('.scale')
         .transition()
         .call(set_reservoir_scale, capacityScale(d.capacity))
     }
 
     function set_hovered_reservoir(d){
       shrink_hovered_reservoir()
-      var el = reservoir_el_given_d(d)
-      d3.select(el).classed('hover', true).select('.scale')
+      var sel = d3.select(reservoir_el_given_d(d))
+      if(sel.classed('selected')) return
+      sel.classed('hover', true).select('.scale')
         .transition().call(set_reservoir_scale, 25)
       // replace old hovered reservoir
-      hovered_reservoir = el
+      hovered_reservoir = sel.node()
       // sort the reservoirs so that the hovered reservoir is on top
       reservoirs.sort(function(a, b){
         return a === d ? 1 : 0 - b === d ? 1 : 0 })
