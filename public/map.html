@@ -9,10 +9,11 @@
         height: 100%;
       }
       body{
-        margin: 0;
+        margin: auto;
         background-color: white;
         color: black;
         font-family: 'Open Sans', sans-serif;
+        width: 700px;
       }
       water-map{
         width: 100%;
@@ -20,10 +21,17 @@
         display: block;
         overflow: hidden;
       }
+      water-map .landmarks circle{
+        fill: rgba(0, 0, 0, 0.4);
+      }
+      water-map .landmarks text{
+        font-size: 10px;
+        fill: #777;
+      }
       water-map .click-region{
         cursor: pointer;
       }
-      water-map path{
+      water-map .geography path{
         fill: none;
         stroke: black;
         opacity: 0.3;
@@ -92,31 +100,45 @@
         /*border: 1px solid red;*/
         box-sizing: border-box;
       }
+      reservoir-detail .axis-y-label{
+        text-anchor: middle;
+        fill: rgba(0, 0, 0, 1);
+        font-size: 10px;
+      }
       reservoir-detail .years line{
         shape-rendering: crispEdges;
       }
       reservoir-detail .years{
         font-size: 14px;
       }
-      reservoir-detail .axis-x{
+      reservoir-detail .axis-x, reservoir-detail .axis-y{
         font-size: 8px;
         fill: none;
         stroke: black;
         shape-rendering: crispEdges;
       }
-      reservoir-detail .axis-x path{
+      reservoir-detail .axis-x path, reservoir-detail .axis-y path{
         stroke: none;
       }
-      reservoir-detail .axis-x text{
+      reservoir-detail .axis-x text, reservoir-detail .axis-y text{
         fill: black;
         stroke: none;
       }
       reservoir-detail path, reservoir-detail line{
-        stroke: rgba(0, 0, 0, 0.2);
+        stroke: rgba(0, 0, 0, 0.05);
       }
       reservoir-detail rect{
         fill: blue;
         opacity: 0.8;
+      }
+      reservoir-detail .year path{
+        fill: none;
+        stroke-width: 2;
+      }
+      reservoir-detail .nob{
+        shape-rendering: geometricPrecision;
+        stroke: #888;
+        fill: white;
       }
       scale-slider{
         width: 100%;
@@ -165,17 +187,24 @@
         display: inline-block;
         -webkit-user-select: none;
       }
-
+      water-map path.callout{
+        stroke: rgba(0, 0, 0, 0.1);
+        stroke-width: 2;
+      }
       water-map .reservoirs .reservoir *{
         vector-effect: non-scaling-stroke;
       }
       water-map .reservoirs .reservoir.hover .level{
         opacity: 0.4;
       }
+      span.acre-feet{
+        opacity: 0.5;
+      }
 
     </style>
   </head>
   <body ng-app="myApp" ng-controller="MainCtrl">
+    <h1> Historic California Reservoir Capacities</h1>
     <div class="map-container">
       <p><div class="play-btn" ng-model="playing" ng-click="playing = !playing">{{ playing ? 'pause' : 'play' }}</div> {{ year }} - {{ months[month] }}</p>
       <scale-slider domain="domain" now="sliderPosition"></scale-slider>
@@ -188,8 +217,8 @@
       </water-map>
       <div class="detail">
         <h1 class="title"> {{reservoir.station}}</h1>
-        <p>storage: {{formatCapacity(history[now].reservoirs[reservoir.id])}}<br>
-          capacity: {{formatCapacity(reservoir.capacity)}}</p>
+        <p>storage: {{formatCapacity(history[now].reservoirs[reservoir.id])}} <span class="acre-feet">acre-feet</span><br>
+          capacity: {{formatCapacity(reservoir.capacity)}} <span class="acre-feet">acre-feet</span></p>
         <reservoir-detail reservoir="reservoir" year="year" month="month"></reservoir-detail>
       </div>
     </div>
@@ -214,7 +243,7 @@ app.controller('MainCtrl', function($scope, $window, $interval){
   var capacity_format = d3.format('.3s')
   $scope.formatCapacity = function(capacity){
     if(isNaN(capacity)) return 'NA'
-    return capacity_format(capacity) + ' AF'
+    return capacity_format(capacity)
   }
   $scope.months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August']
     .concat(['September', 'October', 'November', 'December'])
