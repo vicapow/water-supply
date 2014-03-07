@@ -58,7 +58,10 @@ app.directive('reservoirDetail', function(){
       
       join.exit().remove()
       
-      join.enter().append('g').attr('class', 'year')
+      join.enter().append('g')
+        .attr('class', function(d, i){ return 'year year-' + d.key })
+        
+        .classed('year', true)
         .call(function(year){
           year.append('text').attr('class', 'label')
         })
@@ -82,10 +85,32 @@ app.directive('reservoirDetail', function(){
         .transition()
         .attr('d', function(d){ return line(d.values) })
         .style('stroke', function(d, i){ return colors(i) })
+        .each('end', function(d){
+          var month = scope.month
+          var year = scope.year
+          years.select('.year-' + d.key).call(update_path_length_for_year, month, year)
+        })
     })
-    
-    // scope.$watch('month * year', function(){ })
 
+    function update_path_length_for_year(year_g, month, year){
+      var year_p = year_g.select('path')
+      var l = year_p.node().getTotalLength()
+      var datum = year_g.datum()
+      var my_year = +datum.key
+      var is_past = my_year <= year
+      var is_progressing = my_year === year
+      var dash = [1,1]
+      if(is_progressing) dash = [l * (month - 1) / (datum.values.length - 1), l]
+      year_p.style('stroke-dasharray', dash)
+      year_g.style('opacity', function(d){ return is_past ? 1 : 0 })
+    }
+
+    scope.$watch('month * year', function(){
+      var year = scope.year, month = scope.month
+      years.selectAll('.year').each(function(){
+        d3.select(this).call(update_path_length_for_year, month, year)
+      })
+    })
   }
   return {
     link: link, restrict: 'E', scope: { reservoir: '=', year: '=', month: '=' }

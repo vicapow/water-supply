@@ -32,7 +32,7 @@ function envelopeParams(bbox){
         + ' OR sensor = \'LANDSAT_ETM\''
         + ' OR sensor = \'OLI\''
         + ') '
-        + 'AND (cloudCover <= 20)'
+        + 'AND (cloudCover <= 100)'
     , returnGeometry: 'true'
     , spatialRel: 'esriSpatialRelIntersects'
     , geometry: JSON.stringify({
@@ -80,7 +80,9 @@ var bbox = {
 
 // bbox = {"xmin":40.68718067164527,"ymin":-123.00225521850587,"xmax":41.08274917314995,"ymax":-122.47903134155274}
 
-var bbox = {"xmin":40.03632367438269,"ymin":-80.53305889892579,"xmax":40.832808685888764,"ymax":-79.48661114501954}
+// var bbox = {"xmin":40.03632367438269,"ymin":-80.53305889892579,"xmax":40.832808685888764,"ymax":-79.48661114501954}
+
+bbox = {"xmin":40.39104591240121,"ymin":-80.05858685302735,"xmax":40.48459361209049,"ymax":-79.93567730712891}
 
 // var bbox = {"xmin":37.63357345981025,"ymin":-122.5780799560547,"xmax":37.84046332807191,"ymax":-122.31646801757813}
 
@@ -111,41 +113,44 @@ function request_metadata(cb){
 }
 
 
-var body = require('./example_query.json')
+// var body = require('./example_query.json')
 // got_features(bbox, body.features)
+// debug_features(body.features)
+
+
 request_metadata(got_features)
 
 // // var rasterIds = filterFeaturesByTimestamp(1392940800000, 1, body.features)
 
 function got_features(bbox, features){
   var dates = [
-     new Date("1/01/2011 GMT-0800 (PST)")
-    , new Date("2/01/2011 GMT-0800 (PST)")
-    , new Date("3/01/2011 GMT-0800 (PST)")
-    , new Date("4/01/2011 GMT-0800 (PST)")
-    , new Date("5/01/2011 GMT-0800 (PST)")
-    , new Date("6/01/2011 GMT-0800 (PST)")
-    , new Date("7/01/2011 GMT-0800 (PST)")
-    , new Date("8/01/2011 GMT-0800 (PST)")
-    , new Date("9/01/2011 GMT-0800 (PST)")
-    , new Date("10/01/2011 GMT-0800 (PST)")
-    , new Date("11/01/2011 GMT-0800 (PST)")
-    , new Date("12/01/2011 GMT-0800 (PST)")
+    //  new Date("1/01/2011 GMT-0800 (PST)")
+    // , new Date("2/01/2011 GMT-0800 (PST)")
+    // , new Date("3/01/2011 GMT-0800 (PST)")
+    // , new Date("4/01/2011 GMT-0800 (PST)")
+    // , new Date("5/01/2011 GMT-0800 (PST)")
+    // , new Date("6/01/2011 GMT-0800 (PST)")
+    // , new Date("7/01/2011 GMT-0800 (PST)")
+    // , new Date("8/01/2011 GMT-0800 (PST)")
+    // , new Date("9/01/2011 GMT-0800 (PST)")
+    // , new Date("10/01/2011 GMT-0800 (PST)")
+    // , new Date("11/01/2011 GMT-0800 (PST)")
+    // , new Date("12/01/2011 GMT-0800 (PST)")
 
-    , new Date("1/01/2012 GMT-0800 (PST)")
-    , new Date("2/01/2012 GMT-0800 (PST)")
-    , new Date("3/01/2012 GMT-0800 (PST)")
-    , new Date("4/01/2012 GMT-0800 (PST)")
-    , new Date("5/01/2012 GMT-0800 (PST)")
-    , new Date("6/01/2012 GMT-0800 (PST)")
-    , new Date("7/01/2012 GMT-0800 (PST)")
-    , new Date("8/01/2012 GMT-0800 (PST)")
-    , new Date("9/01/2012 GMT-0800 (PST)")
-    , new Date("10/01/2012 GMT-0800 (PST)")
-    , new Date("11/01/2012 GMT-0800 (PST)")
-    , new Date("12/01/2012 GMT-0800 (PST)")
+    // , new Date("1/01/2012 GMT-0800 (PST)")
+    // , new Date("2/01/2012 GMT-0800 (PST)")
+    // , new Date("3/01/2012 GMT-0800 (PST)")
+    // , new Date("4/01/2012 GMT-0800 (PST)")
+    // , new Date("5/01/2012 GMT-0800 (PST)")
+    // , new Date("6/01/2012 GMT-0800 (PST)")
+    // , new Date("7/01/2012 GMT-0800 (PST)")
+    // , new Date("8/01/2012 GMT-0800 (PST)")
+    // , new Date("9/01/2012 GMT-0800 (PST)")
+    // , new Date("10/01/2012 GMT-0800 (PST)")
+    // , new Date("11/01/2012 GMT-0800 (PST)")
+    // , new Date("12/01/2012 GMT-0800 (PST)")
 
-    , new Date("1/01/2013 GMT-0800 (PST)")
+     new Date("1/01/2013 GMT-0800 (PST)")
     , new Date("2/01/2013 GMT-0800 (PST)")
     , new Date("3/01/2013 GMT-0800 (PST)")
     , new Date("4/01/2013 GMT-0800 (PST)")
@@ -231,7 +236,14 @@ function save_image_from_date(date, filename){
 // // http://landsatlook.usgs.gov/arcgis/rest/services/LandsatLook/ImageServer/exportImage?f=image&format=jpg&renderingRule=%7B%7D&mosaicRule=%7B%22mosaicMethod%22%3A%22esriMosaicLockRaster%22%2C%22ascending%22%3Atrue%2C%22lockRasterIds%22%3A%5B1921787%2C1921786%2C1925686%5D%2C%22mosaicOperation%22%3A%22MT_FIRST%22%7D&bbox=-13638912.713249283%2C4967807.382263688%2C-13611357.164552515%2C4998611.504662573&imageSR=102100&bboxSR=102100&size=721%2C806
 
 
-
+function debug_features(features){
+  features = features.slice()
+    .sort(function(a, b){ 
+      return b.attributes.acquisitionDate - a.attributes.acquisitionDate })
+  features.forEach(function(feature){
+    console.log(new Date(feature.attributes.acquisitionDate))
+  })
+}
 
 
 /* type=0 for only one, 1 for older */
