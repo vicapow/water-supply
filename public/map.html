@@ -188,7 +188,7 @@
         -webkit-user-select: none;
       }
       water-map path.callout{
-        stroke: rgba(0, 0, 0, 0.1);
+        stroke: rgba(0, 0, 0, 0.4);
         stroke-width: 2;
       }
       water-map .reservoirs .reservoir *{
@@ -273,7 +273,7 @@ app.controller('MainCtrl', function($scope, $window, $interval){
         $scope.now++
         if($scope.now >= $scope.history.length) $scope.now = 0
         prev_now = $scope.now
-      }, 500 )
+      }, 650 )
     }else{
       $interval.cancel(interval)
     }

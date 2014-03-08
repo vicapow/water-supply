@@ -2,21 +2,22 @@ app.directive('waterMap', function(){
   function link(scope, el, attr){
     el = el[0]
     var width, height
-    var pi = Math.PI
-    var max_r = 30
-    var svg = d3.select(el).append('svg')
-    var zoomGroup = svg.append('g')
-    var geography = zoomGroup.append('g').attr('class', 'geography')
-    var proj = d3.geo.albers()
-    var shapefile
-    var calloutComing = zoomGroup.append('path').attr('class', 'callout coming')
-    var calloutGoing = zoomGroup.append('path').attr('class', 'callout going')
-    var landmarks = zoomGroup.append('g').attr('class', 'landmarks')
-    var reservoirs = zoomGroup.append('g').attr('class', 'reservoirs')
-      .selectAll('g.reservoir')
-    var clickRegions = svg.append('g').attr('class', 'click-region')
-    var radiusToArea = function(r){ return Math.PI * Math.pow(r, 2) }
-    var areaToRadius = function(area){ return Math.sqrt(area / Math.PI) }
+      , pi = Math.PI
+      , max_r = 30
+      , duration = 650
+      , svg = d3.select(el).append('svg')
+      , zoomGroup = svg.append('g')
+      , geography = zoomGroup.append('g').attr('class', 'geography')
+      , proj = d3.geo.albers()
+      , shapefile
+      , calloutComing = zoomGroup.append('path').attr('class', 'callout coming')
+      , calloutGoing = zoomGroup.append('path').attr('class', 'callout going')
+      , landmarks = zoomGroup.append('g').attr('class', 'landmarks')
+      , reservoirs = zoomGroup.append('g').attr('class', 'reservoirs')
+        .selectAll('g.reservoir')
+      , clickRegions = svg.append('g').attr('class', 'click-region')
+      , radiusToArea = function(r){ return Math.PI * Math.pow(r, 2) }
+      , areaToRadius = function(area){ return Math.sqrt(area / Math.PI) }
 
     // aka, [0, 1] -> [0, pi]
     var capacityScale = d3.scale.linear().range([1, max_r])
@@ -178,7 +179,7 @@ app.directive('waterMap', function(){
       if(scope.history === undefined || scope.now === undefined) return
       if(!scope.history.length) return
       reservoirs.select('.level')
-        .transition().duration(500)
+        .transition().duration(duration)
         .ease('linear')
         .attr('r', function(d){
           var val = scope.history[scope.now].reservoirs[d.id] || 0
