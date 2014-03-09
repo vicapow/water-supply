@@ -1,0 +1,216 @@
+html, body{
+  width: 100%;
+}
+body{
+  margin: auto;
+  background-color: white;
+  color: black;
+  font-family: 'Open Sans', sans-serif;
+  width: 620px;
+  box-sizing: border-box;
+}
+loading-dialog svg rect{
+  fill: rgba(0, 0, 0, 0.2);
+}
+loading-dialog svg text{
+  text-anchor: middle;
+  font-size: 14px;
+  fill: rgba(0, 0, 0, 0.5);
+}
+loading-dialog{
+  top: 30%;
+  left: 50%;
+  position: absolute;
+}
+water-map{
+  width: 620px;
+  height: 620px;
+  display: block;
+  overflow: hidden;
+}
+water-map .landmarks circle{
+  fill: rgba(0, 0, 0, 0.4);
+}
+water-map .landmarks text{
+  font-size: 10px;
+  fill: #777;
+}
+water-map .click-region{
+  cursor: pointer;
+}
+water-map .geography path.counties{
+  fill: white;
+  stroke: #eee;
+  stroke-width: 1;
+  shape-rendering: crispEndges;
+}
+water-map .reservoirs{
+  cursor: pointer;
+}
+water-map circle.capacity{
+  stroke: rgba(0, 0, 0, 0.5);
+  stroke-width: 1;
+  opacity: 1;
+  fill: rgba(0, 0, 0, 0.1);
+}
+water-map circle.level{
+  /*fill: #3498db;*/
+  fill: blue;
+  pointer-events: none;
+}
+water-map circle.capacity{
+  opacity: 0.5;
+  -webkit-transition: all .25s;
+  -moz-transition: all .25s;
+  transition: all .25s;
+}
+/*      water-map circle.capacity:hover{
+  opacity: 1;
+}*/
+input[type="range"]{
+  width: 100%;
+}
+.map-container{
+  /*border: 1px solid rgba(255, 0, 0, 1);*/
+  margin: auto;
+  display: block;
+  width: 620px;
+  position: relative;
+  box-sizing: border-box;
+  -webkit-transition: all 1s ease-out;  /* Chrome 1-25, Safari 3.2+ */
+     -moz-transition: all 1s ease-out;  /* Firefox 4-15 */
+       -o-transition: all 1s ease-out;  /* Opera 10.50–12.00 */
+          transition: all 1s ease-out;  /* Chrome 26, Firefox 16+, IE 10+, Opera 12.10+ */
+}
+.detail{
+  position: absolute;
+  width: 400px;
+  top: 120px;
+  right: -50px;
+}
+.detail .title{
+  text-align: left;
+  padding-left: 60px;
+  font-size: 20px;
+  margin: 0;
+}
+.detail p{
+  text-align: left;
+  padding-left: 60px;
+  margin: 0;
+}
+reservoir-detail{
+  width: 400px;
+  height: 300px;
+  display: block;
+  /*border: 1px solid red;*/
+  box-sizing: border-box;
+}
+reservoir-detail .axis-y-label{
+  text-anchor: middle;
+  fill: rgba(0, 0, 0, 1);
+  font-size: 10px;
+}
+reservoir-detail .years line{
+  shape-rendering: crispEdges;
+}
+reservoir-detail .years{
+  font-size: 14px;
+}
+reservoir-detail .axis-x, reservoir-detail .axis-y{
+  font-size: 8px;
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+reservoir-detail .axis-x path, reservoir-detail .axis-y path{
+  stroke: none;
+}
+reservoir-detail .axis-x text, reservoir-detail .axis-y text{
+  fill: black;
+  stroke: none;
+}
+reservoir-detail path, reservoir-detail line{
+  stroke: rgba(0, 0, 0, 0.05);
+}
+reservoir-detail rect{
+  fill: blue;
+  opacity: 0.8;
+}
+reservoir-detail .year path{
+  fill: none;
+  stroke-width: 2;
+}
+reservoir-detail .nob{
+  shape-rendering: geometricPrecision;
+  stroke: #888;
+  fill: white;
+}
+scale-slider{
+  width: 100%;
+  height: 40px;
+  display: block;
+  shape-rendering: crispEdges;
+  -webkit-user-select: none;
+  user-select: none;
+}
+scale-slider svg{
+  display: block;
+  stroke: black;
+  cursor: pointer;
+}
+scale-slider text{
+  font-size: 10px;
+  stroke: none;
+}
+scale-slider path{
+  fill: none;
+}
+scale-slider path, scale-slider line{
+  stroke: rgba(0, 0, 0, 0.2);
+}
+scale-slider circle.nob{
+  shape-rendering: geometricPrecision;
+  stroke: #888;
+  fill: white;
+  cursor: pointer;
+}
+scale-slider circle.shadow{
+  opacity: 0.1;
+}
+div.play-btn{
+  border: 1px solid #aaa;
+  background-color: white;
+  color: #777;
+  font-weight: 100;
+  padding: 5px;
+  margin: 5px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  cursor: pointer;
+  /*font-size: 10px;*/
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+  display: inline-block;
+  -webkit-user-select: none;
+}
+water-map{
+  position: relative;
+}
+water-map path.callout{
+  stroke: rgba(0, 0, 0, 0.4);
+  stroke-width: 2;
+}
+water-map .reservoirs .reservoir *{
+  vector-effect: non-scaling-stroke;
+}
+water-map .reservoirs .reservoir.hover .level{
+  opacity: 0.4;
+}
+water-map .fill-map{
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+span.acre-feet{
+  opacity: 0.5;
+}
