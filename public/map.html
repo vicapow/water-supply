@@ -24,7 +24,7 @@
         fill: rgba(0, 0, 0, 0.5);
       }
       loading-dialog{
-        top: 50%;
+        top: 30%;
         left: 50%;
         position: absolute;
       }
@@ -83,6 +83,10 @@
         width: 620px;
         position: relative;
         box-sizing: border-box;
+        -webkit-transition: all 1s ease-out;  /* Chrome 1-25, Safari 3.2+ */
+           -moz-transition: all 1s ease-out;  /* Firefox 4-15 */
+             -o-transition: all 1s ease-out;  /* Opera 10.50–12.00 */
+                transition: all 1s ease-out;  /* Chrome 26, Firefox 16+, IE 10+, Opera 12.10+ */
       }
       .detail{
         position: absolute;
@@ -219,7 +223,7 @@
 
     </style>
   </head>
-  <body ng-app="myApp" ng-controller="MainCtrl" ng-cloak>
+  <body ng-app="myApp" ng-controller="MainCtrl" ng-clock>
     <div ng-show="loading">
       <h1> Historic California Reservoir Capacities</h1>
       <p>
@@ -233,7 +237,7 @@
       </p>
     </div>
     <loading-dialog ng-show="!loaded"></loading-dialog>
-    <div class="map-container" ng-show="loaded">
+    <div class="map-container" ng-style="{opacity: loaded ? 1 : 0 }">
       <p><div class="play-btn" ng-model="playing" ng-click="playing = !playing">{{ playing ? 'pause' : 'play' }}</div> {{ year }} - {{ months[month] }}</p>
       <scale-slider domain="domain" now="sliderPosition"></scale-slider>
       <water-map
