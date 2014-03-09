@@ -108,7 +108,7 @@ app.directive('waterMap', function(){
         .style('font-size', '0.5px')
         .style('text-anchor', 'middle')
       reservoir.call(set_reservoir_scale, 0)
-      .transition().delay(1000).duration(1000)
+      .transition().duration(1000)
       .call(set_reservoir_scale_to_capacity)
       reservoir.append('circle')
         .attr('class', 'capacity')
@@ -159,7 +159,7 @@ app.directive('waterMap', function(){
       var sel = d3.select(reservoir_el_given_d(d))
       if(sel.classed('selected')) return
       sel.classed('hover', true).select('.scale')
-        .transition().call(set_reservoir_scale, 25)
+        .transition().call(set_reservoir_scale, max_r)
       // replace old hovered reservoir
       hovered_reservoir = sel.node()
       // sort the reservoirs so that the hovered reservoir is on top
@@ -248,7 +248,7 @@ app.directive('waterMap', function(){
       sel.classed('selected', true)
         .transition()
         .attr('transform', 'translate(' + callout_loc + ')')
-        .select('.scale').attr('transform', 'scale(' + 25 + ')')
+        .select('.scale').attr('transform', 'scale(' + max_r + ')')
       calloutComing.attr('d', 'M' + [p1, p1].join('L') + 'Z')
         .style('opacity', 0)
         .style('stroke-width', 50)
