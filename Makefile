@@ -17,6 +17,12 @@ public/data/counties.json: California\ County\ Shape\ Files/County/CaliforniaCou
 	ogr2ogr -f GeoJSON public/data/counties.json \
 	California\ County\ Shape\ Files/County/CaliforniaCounty.shp
 
+public/data/states.json: State\ Boundaries/statesp020.shp
+	ogr2ogr -f GeoJSON public/data/states.json State\ Boundaries/statesp020.shp
+
+public/data/states.topojson: public/data/states.json
+	topojson public/data/states.json -p -o public/data/states.topojson
+
 public/data/counties.topojson: public/data/counties.json
 	topojson --ignore-shapefile-properties -o public/data/counties.topojson public/data/counties.json
 

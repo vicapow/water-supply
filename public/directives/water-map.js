@@ -4,10 +4,12 @@ app.directive('waterMap', function(){
     var width, height
       , pi = Math.PI
       , max_r = 30
+      , generate_map_png = false
       , duration = 650
-      , svg = d3.select(el).append('svg')
+      , map_bg = d3.select(el).append('canvas')
+      , map_img = d3.select(el).append('img').attr('class', 'fill-map')
+      , svg = d3.select(el).append('svg').attr('class', 'fill-map')
       , zoomGroup = svg.append('g')
-      , geography = zoomGroup.append('g').attr('class', 'geography')
       , proj = d3.geo.albers()
       , shapefile
       , calloutComing = zoomGroup.append('path').attr('class', 'callout coming')
@@ -19,12 +21,13 @@ app.directive('waterMap', function(){
       , radiusToArea = function(r){ return Math.PI * Math.pow(r, 2) }
       , areaToRadius = function(area){ return Math.sqrt(area / Math.PI) }
 
+    map_img.attr('src', 'map_bg.png')
+
     // aka, [0, 1] -> [0, pi]
     var capacityScale = d3.scale.linear().range([1, max_r])
     var voronoi = d3.geom.voronoi()
       .x(function(d){ return proj([d.longitude, d.latitude])[0] })
       .y(function(d){ return proj([d.longitude, d.latitude])[1] })
-    geography.append('path')
 
     var points = svg.append('g')
     var coords = []
@@ -72,12 +75,13 @@ app.directive('waterMap', function(){
     // resize()
     function resize(){
       width = el.clientWidth, height = el.clientHeight
+      map_bg.attr({width: width, height: height})
       svg.attr({width: width, height: height})
       proj.translate([ width / 2, height / 2])
         .rotate([117.9, 1.3, 1])
         .scale(3700)
       voronoi.clipExtent([[50, 90], [width / 2, height * 0.9]])
-
+      map_img.attr({width: width, height: height})
       landmarks.selectAll('g')
         .attr('transform', function(d){
           return 'translate(' +  proj([d.lon, d.lat]) + ')'
@@ -191,12 +195,29 @@ app.directive('waterMap', function(){
     scope.$watch('shapefile', update_shapefile)
     function update_shapefile(_){
       if(!_) return
+      console.log('update shapefile')
       shapefile = _
-      var shape = topojson.feature(shapefile, shapefile.objects.counties)
-      window.shape = shape
-      geography.select('path')
-        .datum(shape)
-        .attr('d', d3.geo.path().projection(proj))
+      if(!generate_map_png) return
+      var counties = topojson.feature(shapefile, shapefile.objects.counties)
+      draw_map_to_canvas(counties)
+    }
+
+    function draw_map_to_canvas(counties){
+      console.log('draw_map_to_canvas')
+      var context = map_bg.node().getContext("2d")
+      var path = d3.geo.path().projection(proj).context(context)
+      context.beginPath()
+      path(counties)
+      context.lineWidth = 4
+      context.strokeStyle = '#ddd'
+      context.stroke()
+      context.fillStyle = 'white'
+      context.fill()
+      context.lineWidth = 1
+      context.strokeStyle = '#ddd'
+      context.stroke()
+      // F it. just save it as an image and load the image
+      window.location = map_bg.node().toDataURL("image/png");
     }
 
     var prev_sel

@@ -31,15 +31,11 @@
       water-map .click-region{
         cursor: pointer;
       }
-      water-map .geography path{
-        fill: none;
-        stroke: black;
-        opacity: 0.3;
-        /*shape-rendering: crispEndges;*/
-      }
-      whater-map path{
-        fill: green;
-        stroke: green;
+      water-map .geography path.counties{
+        fill: white;
+        stroke: #eee;
+        stroke-width: 1;
+        shape-rendering: crispEndges;
       }
       water-map .reservoirs{
         cursor: pointer;
@@ -187,6 +183,9 @@
         display: inline-block;
         -webkit-user-select: none;
       }
+      water-map{
+        position: relative;
+      }
       water-map path.callout{
         stroke: rgba(0, 0, 0, 0.4);
         stroke-width: 2;
@@ -196,6 +195,11 @@
       }
       water-map .reservoirs .reservoir.hover .level{
         opacity: 0.4;
+      }
+      water-map .fill-map{
+        position: absolute;
+        top: 0px;
+        left: 0px;
       }
       span.acre-feet{
         opacity: 0.5;
@@ -343,7 +347,9 @@ app.controller('MainCtrl', function($scope, $window, $interval){
       return row
     }, function(err, history){
       if(err) throw err
-      $scope.$apply(function(){
+      if(!$scope.$$phase) $scope.$apply(got_history)
+      else got_history()
+      function got_history(){
         $scope.now = 0
         $scope.playing = true
         // just just data for the last 5 years
@@ -368,7 +374,7 @@ app.controller('MainCtrl', function($scope, $window, $interval){
             reservoir.data = data
             return reservoir
           }).filter(function(d){ return d.data.length })
-      })
+      }
     })
   })
   d3.json('data/counties.topojson', function(err, shapefile){
