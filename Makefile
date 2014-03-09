@@ -28,3 +28,16 @@ public/data/counties.topojson: public/data/counties.json
 
 public/data/reservoirs.capacities.csv: public/data/reservoirs.csv scrappers/capacities.js
 	node scrappers/capacities.js
+
+uglify: js/main.min.js
+
+js/main.min.js:
+	uglifyjs public/js/d3.js > public/js/main.min.js
+	uglifyjs public/js/angular.js >> public/js/main.min.js
+	uglifyjs public/js/topojson.v1.js >> public/js/main.min.js
+	uglifyjs public/js/main.js >> public/js/main.min.js
+	uglifyjs public/js/directives/bar-chart.js >> public/js/main.min.js
+	uglifyjs public/js/directives/water-map.js >> public/js/main.min.js
+	uglifyjs public/js/directives/loading-dialog.js >> public/js/main.min.js
+	uglifyjs public/js/directives/reservoir-detail.js >> public/js/main.min.js
+	uglifyjs public/js/directives/scale-slider.js >> public/js/main.min.js
