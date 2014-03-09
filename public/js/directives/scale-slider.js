@@ -17,13 +17,15 @@ app.directive('scaleSlider', function(){
     nobG.style('pointer-events', 'none')
     clickRect
       .on('click', function(){
-        console.log('click', dragging)
         if(dragging) return
         d3.event.stopPropagation()
         position_playhead(d3.event.offsetX)
       })
       .call(d3.behavior.drag()
-        .on('dragstart', function(){ dragging = true })
+        .on('dragstart', function(){
+          if(window._gaq) _gaq.push(['_trackEvent', 'slider', 'drag', 'start'])
+          dragging = true
+        })
         .on('dragend', function(){ dragging = false})
         .on('drag', function(){ position_playhead(d3.event.x) }))
 

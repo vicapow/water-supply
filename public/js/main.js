@@ -23,6 +23,7 @@ app.controller('MainCtrl', function($scope, $window, $interval){
   var interval
   $scope.sliderPosition = null
   $scope.$watch('playing', function(playing){
+    if(window._gaq) _gaq.push(['_trackEvent', 'timeline', 'playing', playing])
     if(playing){
       var prev_now = $scope.now
       interval = $interval(function(){
@@ -64,6 +65,9 @@ app.controller('MainCtrl', function($scope, $window, $interval){
       return d3.max(d.values, function(d){ return d.value })
     })
   }
+  $scope.$watch('reservoir', function(reservoir){
+    if(window._gaq) _gaq.push(['_trackEvent', 'reservoir', 'selected', reservoir.station])
+  })
   d3.csv('data/reservoirs.capacities.csv', function(row){
     row.elev = Number(row.elev)
     row.latitude = Number(row.latitude)
@@ -134,6 +138,7 @@ app.controller('MainCtrl', function($scope, $window, $interval){
             return reservoir
           }).filter(function(d){ return d.data.length })
         $scope.loaded = true
+        if(window._gaq) _gaq.push(['_trackEvent', 'data', 'loading', 'finish'])
       }
     })
   })

@@ -292,7 +292,7 @@ app.directive('waterMap', function(){
       , shapefile: '='
       , history: '='
       , now: '='
-      , selectedReservoir: '='
+      , selectedReservoir: '=?'
     }
   }
 })
