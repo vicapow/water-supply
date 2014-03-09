@@ -5,6 +5,7 @@ app.directive('waterMap', function(){
       , pi = Math.PI
       , max_r = 30
       , generate_map_png = false
+      , color = d3.scale.linear().range(['red', 'blue'])
       , png_not_canvas = true
       , duration = 650
       , map_bg = d3.select(el).append('canvas')
@@ -194,6 +195,11 @@ app.directive('waterMap', function(){
           var ratio = val / d.capacity
           return areaToRadius(ratio * pi)
         })
+        .style('fill', function(d){
+          var val = scope.history[scope.now].reservoirs[d.id] || 0
+          var ratio = val / d.capacity
+          return color(ratio)
+        })
     }
 
     scope.$watch('shapefile', update_shapefile)
@@ -252,7 +258,7 @@ app.directive('waterMap', function(){
       if(!prev_sel || !prev_sel.node()) return prev_sel = sel, hovered_reservoir = null
       d = prev_sel.datum()
       p1 = proj([d.longitude, d.latitude])
-      p2 = [300, 073]
+      p2 = callout_loc
       c = [p2[0] - p1[0], p2[1] - p1[1]]
       l = Math.sqrt(c[0]*c[0]+c[1]*c[1])
       c[0] = c[0] / l * (l - 40), c[1] = c[1] / l * (l - 40)
