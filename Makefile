@@ -41,3 +41,10 @@ js/main.min.js:
 	uglifyjs public/js/directives/loading-dialog.js >> public/js/main.min.js
 	uglifyjs public/js/directives/reservoir-detail.js >> public/js/main.min.js
 	uglifyjs public/js/directives/scale-slider.js >> public/js/main.min.js
+
+
+uglifycss: public/style.min.css
+
+public/style.min.css: public/style.css
+	uglifycss public/style.css > public/style.min.css
+
