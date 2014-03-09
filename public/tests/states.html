@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <style>
+      body, html{
+        margin: 0;
+        width: 100%;
+        height: 100%;
+      }
+      state-map{
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        display: block;
+      }
+      state-map path{
+        fill: none;
+        stroke: black;
+      }
+      circle{
+        stroke: red;
+        stroke-width: 10;
+      }
+    </style>
+  </head>
+  <body ng-app="app" ng-controller="MainCtrl">
+    <state-map></state-map>
+    <script src="/d3.js" charset="utf-8"></script>
+    <script src="/angular.js" charset="utf-8"></script>
+    <script src="/topojson.v1.js" charset="utf-8"></script>
+    <script>
+
+'use strict'
+
+var app = angular.module('app', [])
+
+app.controller('MainCtrl', function($scope, $window){
+  d3.json('/data/states.topojson', function(err, shapefile){
+    if(err) throw err
+    $scope.$apply(function(){
+      var states = topojson.feature(shapefile, shapefile.objects.states)
+      window.states = $scope.states = states
+      window.shapefile = shapefile
+    })
+  })
+})
+
+app.directive('stateMap',function(){
+  function link(scope, el, attr){
+    el = el[0]
+    var w = el.clientWidth, h = el.clientHeight
+    var svg = d3.select(el).append('svg').attr({width: w, height: h })
+    var proj = d3.geo.albers()
+    var path = svg.append('path')
+
+      proj.translate([ w / 2, h / 2])
+        .rotate([117.9, 1.3, 1])
+        .scale(3700)
+
+    scope.$watch(function(){
+      return w = el.clientWidth, h = el.clientHeight, w + h
+    }, update_size)
+
+    function update_size(){
+      console.log('size changed...')
+    }
+
+    scope.$watch('states', function(states){
+      console.log('shapefile', states)
+      path.datum(states).attr('d', d3.geo.path().projection(proj))
+    })
+
+  }
+  return {
+    link: link, restrict: 'E'
+  }
+})
+    </script>
+  </body>
+</html>

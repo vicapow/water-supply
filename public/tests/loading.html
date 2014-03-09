@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <style type="text/css">
+      body{
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body ng-app="app" ng-controller="MainCtrl">
+    <input type="checkbox" ng-model="showIt">
+    <loading-dialog ng-show="showIt"></loading-dialog>
+    <h1> message: </h1> <p> {{msg}} </p>
+    <script src="/d3.js" charset="utf-8"></script>
+    <script src="/angular.js" charset="utf-8"></script>
+    <script>
+var app = angular.module('app', [])
+
+app.controller('MainCtrl', function($scope){
+  $scope.showIt = true
+})
+    </script>
+    <script src="/directives/loading-dialog.js" charset="utf-8"></script>
+  </body>
+</html>

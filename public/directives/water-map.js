@@ -5,9 +5,11 @@ app.directive('waterMap', function(){
       , pi = Math.PI
       , max_r = 30
       , generate_map_png = false
+      , png_not_canvas = true
       , duration = 650
       , map_bg = d3.select(el).append('canvas')
       , map_img = d3.select(el).append('img').attr('class', 'fill-map')
+          .style('display', png_not_canvas ? 'block' : 'none')
       , svg = d3.select(el).append('svg').attr('class', 'fill-map')
       , zoomGroup = svg.append('g')
       , proj = d3.geo.albers()
@@ -75,11 +77,12 @@ app.directive('waterMap', function(){
     // resize()
     function resize(){
       width = el.clientWidth, height = el.clientHeight
+      console.log('width', width, height)
       map_bg.attr({width: width, height: height})
       svg.attr({width: width, height: height})
-      proj.translate([ width / 2, height / 2])
+      proj.translate([width / 2 - 20, height / 2])
         .rotate([117.9, 1.3, 1])
-        .scale(3700)
+        .scale(3000)
       voronoi.clipExtent([[50, 90], [width / 2, height * 0.9]])
       map_img.attr({width: width, height: height})
       landmarks.selectAll('g')
@@ -119,6 +122,7 @@ app.directive('waterMap', function(){
       join.style('fill', function(d, i){ return 'rgba(0, 0, 0, 0)' })
         .style('stroke', 'none')
         .attr('d', function(d){
+          if(d.length === 0) return ''
           return 'M' + d3.geom.polygon(poly).clip(d).join('L') + 'Z' 
         })
         .on('click', function(d, i){
@@ -197,7 +201,7 @@ app.directive('waterMap', function(){
       if(!_) return
       console.log('update shapefile')
       shapefile = _
-      if(!generate_map_png) return
+      if(png_not_canvas) return
       var counties = topojson.feature(shapefile, shapefile.objects.counties)
       draw_map_to_canvas(counties)
     }
@@ -217,7 +221,8 @@ app.directive('waterMap', function(){
       context.strokeStyle = '#ddd'
       context.stroke()
       // F it. just save it as an image and load the image
-      window.location = map_bg.node().toDataURL("image/png");
+      if(generate_map_png)
+        window.location = map_bg.node().toDataURL("image/png");
     }
 
     var prev_sel
@@ -225,7 +230,9 @@ app.directive('waterMap', function(){
       if(!d) return
       var sel = d3.select(reservoir_el_given_d(d))
       if(prev_sel && sel.node() === prev_sel.node()) return
-      var p1 = proj([d.longitude, d.latitude]), p2 = [300, 073]
+      var p1 = proj([d.longitude, d.latitude])
+        , callout_loc = [270, 073]
+        , p2 = callout_loc
       scope.selectedReservoir = d
       p1 = proj([d.longitude, d.latitude])
       var c = [p2[0] - p1[0], p2[1] - p1[1]]
@@ -234,7 +241,7 @@ app.directive('waterMap', function(){
       p2 = [p1[0] + c[0], p1[1] + c[1]]
       sel.classed('selected', true)
         .transition()
-        .attr('transform', 'translate(' + [300, 073] + ')')
+        .attr('transform', 'translate(' + callout_loc + ')')
         .select('.scale').attr('transform', 'scale(' + 25 + ')')
       calloutComing.attr('d', 'M' + [p1, p1].join('L') + 'Z')
         .style('opacity', 0)

@@ -6,18 +6,32 @@
     <style>
       html, body{
         width: 100%;
-        height: 100%;
       }
       body{
         margin: auto;
         background-color: white;
         color: black;
         font-family: 'Open Sans', sans-serif;
-        width: 700px;
+        width: 620px;
+        box-sizing: border-box;
+        border: 1px solid red;
+      }
+      loading-dialog svg rect{
+        fill: rgba(0, 0, 0, 0.2);
+      }
+      loading-dialog svg text{
+        text-anchor: middle;
+        font-size: 14px;
+        fill: rgba(0, 0, 0, 0.5);
+      }
+      loading-dialog{
+        top: 50%;
+        left: 50%;
+        position: absolute;
       }
       water-map{
-        width: 100%;
-        height: 100%;
+        width: 620px;
+        height: 620px;
         display: block;
         overflow: hidden;
       }
@@ -67,8 +81,7 @@
         /*border: 1px solid rgba(255, 0, 0, 1);*/
         margin: auto;
         display: block;
-        width: 700px;
-        height: 700px;
+        width: 620px;
         position: relative;
         box-sizing: border-box;
       }
@@ -76,7 +89,7 @@
         position: absolute;
         width: 400px;
         top: 120px;
-        right: 0;
+        right: -50px;
       }
       .detail .title{
         text-align: left;
@@ -150,7 +163,7 @@
         cursor: pointer;
       }
       scale-slider text{
-        font-size: 8px;
+        font-size: 10px;
         stroke: none;
       }
       scale-slider path{
@@ -208,17 +221,20 @@
     </style>
   </head>
   <body ng-app="myApp" ng-controller="MainCtrl">
-    <h1> Historic California Reservoir Capacities</h1>
-    <p>
-      Typically, the winter months, December, January, and February, are the time California collects the bulk of its water supply from rain and snow fall. This water is collected into California's many reservoirs for storage. However, the past few years has seen particularly low precipitation. 2012 was the states 12th driest year on record; 2013, the 11th.
-    </p>
-    <p>
-      The typical ebb and flow of these reservoirs is to fill up in the winter from rain and snowfall runoff and slowly deplete over the summer. However, as the visualization below illustrates, several major reservoirs are already at their lowest capacity across a five year span.
-    </p>
-    <p>
-      Control the current date by clicking and dragging on the timeline nob. Change the selected reservoir by clicking on a different reservoir in the map.
-    </p>
-    <div class="map-container">
+    <div ng-show="loading">
+      <h1> Historic California Reservoir Capacities</h1>
+      <p>
+        Typically, the winter months, December, January, and February, are the time California collects the bulk of its water supply from rain and snow fall. This water is collected into California's many reservoirs for storage. However, the past few years has seen particularly low precipitation. 2012 was the states 12th driest year on record; 2013, the 11th.
+      </p>
+      <p>
+        The typical ebb and flow of these reservoirs is to fill up in the winter from rain and snowfall runoff and slowly deplete over the summer. However, as the visualization below illustrates, several major reservoirs are already at their lowest capacity across a five year span.
+      </p>
+      <p>
+        Control the current date by clicking and dragging on the timeline nob. Change the selected reservoir by clicking on a different reservoir in the map.
+      </p>
+    </div>
+    <loading-dialog ng-show="!loaded"></loading-dialog>
+    <div class="map-container" ng-show="loaded">
       <p><div class="play-btn" ng-model="playing" ng-click="playing = !playing">{{ playing ? 'pause' : 'play' }}</div> {{ year }} - {{ months[month] }}</p>
       <scale-slider domain="domain" now="sliderPosition"></scale-slider>
       <water-map
@@ -374,6 +390,7 @@ app.controller('MainCtrl', function($scope, $window, $interval){
             reservoir.data = data
             return reservoir
           }).filter(function(d){ return d.data.length })
+        $scope.loaded = true
       }
     })
   })
@@ -386,6 +403,7 @@ app.controller('MainCtrl', function($scope, $window, $interval){
     </script>
     <script src="directives/bar-chart.js"></script>
     <script src="directives/water-map.js"></script>
+    <script src="directives/loading-dialog.js"></script>
     <script src="directives/reservoir-detail.js"></script>
     <script src="directives/scale-slider.js"></script>
 </html>
