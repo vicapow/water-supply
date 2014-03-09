@@ -14,7 +14,6 @@
         font-family: 'Open Sans', sans-serif;
         width: 620px;
         box-sizing: border-box;
-        border: 1px solid red;
       }
       loading-dialog svg rect{
         fill: rgba(0, 0, 0, 0.2);
@@ -220,7 +219,7 @@
 
     </style>
   </head>
-  <body ng-app="myApp" ng-controller="MainCtrl">
+  <body ng-app="myApp" ng-controller="MainCtrl" ng-cloak>
     <div ng-show="loading">
       <h1> Historic California Reservoir Capacities</h1>
       <p>
