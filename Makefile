@@ -29,9 +29,7 @@ public/data/counties.topojson: public/data/counties.json
 public/data/reservoirs.capacities.csv: public/data/reservoirs.csv scrappers/capacities.js
 	node scrappers/capacities.js
 
-uglify: js/main.min.js
-
-js/main.min.js:
+uglifyjs:
 	uglifyjs public/js/d3.js > public/js/main.min.js
 	uglifyjs public/js/angular.js >> public/js/main.min.js
 	uglifyjs public/js/topojson.v1.js >> public/js/main.min.js
@@ -43,8 +41,11 @@ js/main.min.js:
 	uglifyjs public/js/directives/scale-slider.js >> public/js/main.min.js
 
 
-uglifycss: public/style.min.css
+uglifycss:
+	uglifycss public/css/style.css > public/css/style.min.css
 
-public/style.min.css: public/style.css
-	uglifycss public/style.css > public/style.min.css
+
+uglify: uglifycss uglifyjs
+
+.PHONY: uglifycss uglifycjs
 

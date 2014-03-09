@@ -36,7 +36,7 @@ app.directive('waterMap', function(){
     var coords = []
     var hovered_reservoir = null
 
-    // add some landmarks
+    // add some landmarks for reference
     var landmark = landmarks.selectAll('g').data([
       {
           name: 'San Francisco'
@@ -118,7 +118,8 @@ app.directive('waterMap', function(){
       join.exit().remove()
       join.enter().append('path')
       // clipping polygon for voronoi region
-      var poly = [[211.5,102],[388.5,492],[323.5,599],[201.5,563],[42.5,258],[62.5,101]].reverse()
+      var poly = [[211.5,102],[388.5,492],[323.5,599],[201.5,563]
+        ,[42.5,258],[62.5,101]].reverse()
       poly = d3.geom.polygon(poly)
       join.style('fill', function(d, i){ return 'rgba(0, 0, 0, 0)' })
         .style('stroke', 'none')
@@ -195,11 +196,11 @@ app.directive('waterMap', function(){
           var ratio = val / d.capacity
           return areaToRadius(ratio * pi)
         })
-        .style('fill', function(d){
-          var val = scope.history[scope.now].reservoirs[d.id] || 0
-          var ratio = val / d.capacity
-          return color(ratio)
-        })
+        // .style('fill', function(d){
+        //   var val = scope.history[scope.now].reservoirs[d.id] || 0
+        //   var ratio = val / d.capacity
+        //   return color(ratio)
+        // })
     }
 
     scope.$watch('shapefile', update_shapefile)
@@ -221,14 +222,13 @@ app.directive('waterMap', function(){
       context.lineWidth = 4
       context.strokeStyle = '#ddd'
       context.stroke()
-      context.fillStyle = 'white'
+      context.fillStyle = '#f5f5f5'
       context.fill()
       context.lineWidth = 1
       context.strokeStyle = '#ddd'
       context.stroke()
       // F it. just save it as an image and load the image
-      if(generate_map_png)
-        window.location = map_bg.node().toDataURL("image/png");
+      if(generate_map_png) window.location = map_bg.node().toDataURL("image/png")
     }
 
     var prev_sel
@@ -255,7 +255,8 @@ app.directive('waterMap', function(){
         .transition().attr('d', 'M' + [p1, p2].join('L') + 'Z')
         .style('opacity', 1)
         .style('stroke-width', 1)
-      if(!prev_sel || !prev_sel.node()) return prev_sel = sel, hovered_reservoir = null
+      if(!prev_sel || !prev_sel.node())
+        return prev_sel = sel, hovered_reservoir = null
       d = prev_sel.datum()
       p1 = proj([d.longitude, d.latitude])
       p2 = callout_loc
