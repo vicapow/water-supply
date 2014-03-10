@@ -27,12 +27,12 @@ function envelopeParams(bbox){
         + 'AND  acquisitionDate <= date\'2014-12-31\') '
         + 'AND (dayOfYear >=1 AND  dayOfYear <= 366) '
         + 'AND ('
-        + ' sensor = \'TM\''
+        + ' sensor = \'TM\' '
         + ' OR sensor = \'ETM\' '
         + ' OR sensor = \'LANDSAT_ETM\''
         + ' OR sensor = \'OLI\''
         + ') '
-        + 'AND (cloudCover <= 100)'
+        + 'AND (cloudCover <= 20)'
     , returnGeometry: 'true'
     , spatialRel: 'esriSpatialRelIntersects'
     , geometry: JSON.stringify({
@@ -77,15 +77,28 @@ var bbox = {
   , ymax: -121.2919672
 }
 
+// new york
+// var bbox =  {"xmin":40.62128340983513,"ymin":-74.20459057617188,"xmax":40.86215564702996,"ymax":-73.8207557373047}
 
-// bbox = {"xmin":40.68718067164527,"ymin":-123.00225521850587,"xmax":41.08274917314995,"ymax":-122.47903134155274}
+// north korea
+// var bbox =  {"xmin":40.436268175763566,"ymin":127.13257525634765,"xmax":40.55740783664605,"ymax":127.31316302490234} 
 
-// var bbox = {"xmin":40.03632367438269,"ymin":-80.53305889892579,"xmax":40.832808685888764,"ymax":-79.48661114501954}
+// pittsburgh
+// bbox = {"xmin":40.37891830533692,"ymin":-80.11493470001221,"xmax":40.50016136147022,"ymax":-79.90138794708253} 
 
-bbox = {"xmin":40.39104591240121,"ymin":-80.05858685302735,"xmax":40.48459361209049,"ymax":-79.93567730712891}
+// california
+// bbox =  {"xmin":29.011669906392473,"ymin":-129.5149591140747,"xmax":45.16164656224073,"ymax":-108.77277161407471} 
 
-// var bbox = {"xmin":37.63357345981025,"ymin":-122.5780799560547,"xmax":37.84046332807191,"ymax":-122.31646801757813}
+// shasta
+// bbox =  {"xmin":40.692549861651514,"ymin":-122.47546936798096,"xmax":40.958577819633184,"ymax":-122.12390686798096} 
 
+// OROVILLE DAM
+// bbox =  {"xmin":39.4870201775174,"ymin":-121.60548950958253,"xmax":39.7578154409375,"ymax":-121.25392700958253} 
+
+// Lake Cachuma
+// bbox =  {"xmin":34.50394111430936,"ymin":-120.01521851348878,"xmax":34.64867424161084,"ymax":-119.83943726348878} 
+
+bbox =  {"xmin":40.78109527549421,"ymin":-122.93140198516846,"xmax":41.04676843697316,"ymax":-122.57983948516846}
 
 // convert to web mercator coordinate system
 bbox = {
@@ -115,7 +128,6 @@ function request_metadata(cb){
 
 // var body = require('./example_query.json')
 // got_features(bbox, body.features)
-// debug_features(body.features)
 
 
 request_metadata(got_features)
@@ -123,62 +135,45 @@ request_metadata(got_features)
 // // var rasterIds = filterFeaturesByTimestamp(1392940800000, 1, body.features)
 
 function got_features(bbox, features){
-  var dates = [
-    //  new Date("1/01/2011 GMT-0800 (PST)")
-    // , new Date("2/01/2011 GMT-0800 (PST)")
-    // , new Date("3/01/2011 GMT-0800 (PST)")
-    // , new Date("4/01/2011 GMT-0800 (PST)")
-    // , new Date("5/01/2011 GMT-0800 (PST)")
-    // , new Date("6/01/2011 GMT-0800 (PST)")
-    // , new Date("7/01/2011 GMT-0800 (PST)")
-    // , new Date("8/01/2011 GMT-0800 (PST)")
-    // , new Date("9/01/2011 GMT-0800 (PST)")
-    // , new Date("10/01/2011 GMT-0800 (PST)")
-    // , new Date("11/01/2011 GMT-0800 (PST)")
-    // , new Date("12/01/2011 GMT-0800 (PST)")
+  console.log('got features')
 
-    // , new Date("1/01/2012 GMT-0800 (PST)")
-    // , new Date("2/01/2012 GMT-0800 (PST)")
-    // , new Date("3/01/2012 GMT-0800 (PST)")
-    // , new Date("4/01/2012 GMT-0800 (PST)")
-    // , new Date("5/01/2012 GMT-0800 (PST)")
-    // , new Date("6/01/2012 GMT-0800 (PST)")
-    // , new Date("7/01/2012 GMT-0800 (PST)")
-    // , new Date("8/01/2012 GMT-0800 (PST)")
-    // , new Date("9/01/2012 GMT-0800 (PST)")
-    // , new Date("10/01/2012 GMT-0800 (PST)")
-    // , new Date("11/01/2012 GMT-0800 (PST)")
-    // , new Date("12/01/2012 GMT-0800 (PST)")
+  sort_features(features)
 
-     new Date("1/01/2013 GMT-0800 (PST)")
-    , new Date("2/01/2013 GMT-0800 (PST)")
-    , new Date("3/01/2013 GMT-0800 (PST)")
-    , new Date("4/01/2013 GMT-0800 (PST)")
-    , new Date("5/01/2013 GMT-0800 (PST)")
-    , new Date("6/01/2013 GMT-0800 (PST)")
-    , new Date("7/01/2013 GMT-0800 (PST)")
-    , new Date("8/01/2013 GMT-0800 (PST)")
-    , new Date("9/01/2013 GMT-0800 (PST)")
-    , new Date("10/01/2013 GMT-0800 (PST)")
-    , new Date("11/01/2013 GMT-0800 (PST)")
-    , new Date("12/01/2013 GMT-0800 (PST)")
+  features.forEach(function(feature){
+    console.log(new Date(feature.attributes.acquisitionDate))
+  })
 
-    , new Date("01/01/2014 GMT-0800 (PST)")
-    , new Date('02/01/2014 GMT-0800 (PST)')
-    , new Date('03/01/2014 GMT-0800 (PST)')
-  ];
-  dates = dates.map(function(date){
+  var dates = []
+  // for(var i = 1999; i <= 2013; i++){
+  //   for(var j = 1; j <= 12; j++){
+  //     dates.push(new Date( '' + j + '/01/' + i + ' GMT-0800 (PST)'))
+  //   }
+  // }
+  // dates.push(new Date('1/01/2014 GMT-0800 (PST)'))
+  // dates.push(new Date('2/01/2014 GMT-0800 (PST)'))
+
+  dates.push(new Date('3/01/2013 GMT-0800 (PST)'))
+  dates.push(new Date('3/01/2014 GMT-0800 (PST)'))
+  console.log(dates)
+
+  dates.map(function(date){
     date = Number(date)
+    console.log('features for date', new Date(date))
+    var date_features = features_by_timestamp(date, features)
+    date_features.sort(function(a, b){
+      return a.attributes.acquisitionDate - b.attributes.acquisitionDate
+    })
+    var ids = date_features
+      .map(function(feature){ return feature.attributes.OBJECTID })
+    console.log('\tfeatures:', date_features.map(function(f){ return JSON.stringify([new Date(f.attributes.acquisitionDate), f.attributes.OBJECTID]) }))
     return {
-      // find all the closest ids by date without going over
-      ids: filter_features_by_timestamp(date, 1, features)
+        // find all the closest ids by date without going over
+        ids: ids
       , date: date
       , bbox: bbox
     }
-  })
-  // console.log(JSON.stringify(dates, null, 2))
-  dates.map(function(d){
-    save_image_from_date(d, 'test-' + d.date)
+  }).map(function(obj){
+    save_image_from_date(obj, 'test-' + obj.date + '.jpg')
   })
 }
 
@@ -222,59 +217,45 @@ function save_image_from_date(date, filename){
   request.get({
     url: base + '?' + qs.stringify(params)
     , encoding: null
-  // }, function(err, res, body){
-  //   if(err) throw err
-  //   if(res.statusCode !== 200) throw body
-  //   // console.log(Buffer.isBuffer(body))
-  //   // fs.writeFileSync('./test.jpg', body)
-  // })
-  })
-  .pipe(fs.createWriteStream(filename))
-  // .pipe(fs.createWriteStream('test.jpg'))
+  }).pipe(fs.createWriteStream(filename))
 }
 
-// // http://landsatlook.usgs.gov/arcgis/rest/services/LandsatLook/ImageServer/exportImage?f=image&format=jpg&renderingRule=%7B%7D&mosaicRule=%7B%22mosaicMethod%22%3A%22esriMosaicLockRaster%22%2C%22ascending%22%3Atrue%2C%22lockRasterIds%22%3A%5B1921787%2C1921786%2C1925686%5D%2C%22mosaicOperation%22%3A%22MT_FIRST%22%7D&bbox=-13638912.713249283%2C4967807.382263688%2C-13611357.164552515%2C4998611.504662573&imageSR=102100&bboxSR=102100&size=721%2C806
 
-
-function debug_features(features){
-  features = features.slice()
-    .sort(function(a, b){ 
-      return b.attributes.acquisitionDate - a.attributes.acquisitionDate })
-  features.forEach(function(feature){
-    console.log(new Date(feature.attributes.acquisitionDate))
+function features_by_timestamp(timestamp, features){
+  var uniquePRs = _.uniq(features.map(function(feature){ return feature.attributes.PR }))
+  var features_by_pr = _.groupBy(features, function(feature){
+    return feature.attributes.PR
   })
+  var uniquePRs = Object.keys(features_by_pr)
+  var closest_features = uniquePRs.map(function(pr_id){
+    var features = features_by_pr[pr_id], closest, closest_diff
+    features.forEach(function(feature){
+      var date = feature.attributes.acquisitionDate
+        , diff = Math.abs(date - timestamp)
+      if(closest && diff > closest_diff) return
+      closest_diff = diff, closest = feature
+    })
+    return closest
+  })
+  return closest_features
 }
-
 
 /* type=0 for only one, 1 for older */
-function filter_features_by_timestamp(timestamp, type, features) {
+function filter_features_by_timestamp(timestamp, type, features){
   // console.log("Inside filterDisplayFeatures > time: " + timestamp + " - type: " + type)
   var ids = []
     , uniquePR = []
     , acqDates = []
 
-  console.log(new Date(timestamp))
   var uniquePRs = _.uniq(features.map(function(feature){ return feature.attributes.PR }))
   
   if(type !== 0 && type !== 1) throw new Error('filterDisplayFeatures: unsupported type: ' + type)
   if(!features) throw new Error('filterDisplayFeatures: features is not defined!')
   
-  // pre sort the features by acquisition date
-  features = features.slice()
-    // all the newer dates, first
-    .sort(function(a, b){ return b.attributes.acquisitionDate - a.attributes.acquisitionDate })
-  
   // find all the clostes PRs by date
 
   var prs = _.groupBy(features, function(feature){
     return feature.attributes.PR
-  })
-
-  uniquePRs.forEach(function(pr){
-    console.log('pr', pr)
-    prs[pr].forEach(function(feature){
-      console.log(new Date(feature.attributes.acquisitionDate))
-    })
   })
 
   var closestPRs = uniquePRs.map(function(pr){
@@ -301,12 +282,6 @@ function filter_features_by_timestamp(timestamp, type, features) {
     })
     return best
   }
-
-  // var best = best_feature().attributes
-
-  // console.log('best', best, 'for timestamp', timestamp)
-
-  // return [best.OBJECTID]
 
   var closests = closestPRs.sort(function(a, b){
     return Math.abs(b.attributes.acquisitionDate - timestamp)
@@ -337,5 +312,9 @@ function filter_features_by_timestamp(timestamp, type, features) {
   // return ids
 }
 
-
-
+// sort the envelope features by acquisition date
+function sort_features(features){
+  return features
+    // all the newer dates, first
+    .sort(function(a, b){ return b.attributes.acquisitionDate - a.attributes.acquisitionDate })
+}
