@@ -26,6 +26,8 @@ public/data/states.topojson: public/data/states.json
 public/data/counties.topojson: public/data/counties.json
 	topojson --ignore-shapefile-properties -o public/data/counties.topojson public/data/counties.json
 
+reservoirs: public/data/reservoirs.capacities.csv
+
 public/data/reservoirs.capacities.csv: public/data/reservoirs.csv scrappers/capacities.js
 	node scrappers/capacities.js
 

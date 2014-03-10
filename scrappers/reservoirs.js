@@ -29,6 +29,7 @@ request.get({
       if(headers[i] === 'longitude') val = '-' + val
       // SJT. it's not a real station (UPPER SAN JOAQUIN TOTAL)
       if(headers[i] === 'id' && val === 'SJT') skip = true
+      if(headers[i] === 'station') val = val.replace(/\s*\(.*\)$/, '').replace(/\s+DAM$/, '').replace(/\s+NEAR.*$/, '')
       row.push(val)
     })
     row.push(region)

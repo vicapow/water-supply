@@ -39,7 +39,7 @@ app.directive('stackedBarChart', function(){
         , height: function(d){ return y(d.y) }
         , width: x.rangeBand()
       }).on('mouseover', function(d){
-        console.log(d.x)
+        // console.log(d.x)
       })
     }
 

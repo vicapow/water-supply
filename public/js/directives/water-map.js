@@ -78,7 +78,6 @@ app.directive('waterMap', function(){
     // resize()
     function resize(){
       width = el.clientWidth, height = el.clientHeight
-      console.log('width', width, height)
       map_bg.attr({width: width, height: height})
       svg.attr({width: width, height: height})
       proj.translate([width / 2 - 20, height / 2])
@@ -206,7 +205,6 @@ app.directive('waterMap', function(){
     scope.$watch('shapefile', update_shapefile)
     function update_shapefile(_){
       if(!_) return
-      console.log('update shapefile')
       shapefile = _
       if(png_not_canvas) return
       var counties = topojson.feature(shapefile, shapefile.objects.counties)
@@ -214,7 +212,6 @@ app.directive('waterMap', function(){
     }
 
     function draw_map_to_canvas(counties){
-      console.log('draw_map_to_canvas')
       var context = map_bg.node().getContext("2d")
       var path = d3.geo.path().projection(proj).context(context)
       context.beginPath()

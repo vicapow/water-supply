@@ -35,7 +35,10 @@ app.controller('MainCtrl', function($scope, $window, $interval){
           return
         }
         $scope.now++
-        if($scope.now >= $scope.history.length) $scope.now = 0
+        if($scope.now >= $scope.history.length){
+          $scope.playing = false
+          $scope.now--
+        }
         prev_now = $scope.now
       }, 650 )
     }else{

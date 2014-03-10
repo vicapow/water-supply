@@ -27,7 +27,6 @@ app.directive('barChart', function(){
       rects.exit().remove()
       rects.enter().append('rect')
         .attr("class", 'bar')
-        .on('mouseover', function(d){ return console.log(d) })
       rects.attr({
           x: function(d){ return x(d.month) }
         , y: function(d){ return y(d.value) }
