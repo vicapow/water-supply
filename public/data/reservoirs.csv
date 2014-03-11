@@ -1,4 +1,4 @@
-id,dam,lake,stream,capacity (af),elevation,river_basin,county,hydrologic_area,nearby_city,latitude,longitude,operator
+id,dam,lake,stream,capacity,elevation,river_basin,county,hydrologic_area,nearby_city,latitude,longitude,operator
 APN,Alpine,Alpine Lake,Lagunitas Creek,8900,654' ft,COAST-MARIN,MARIN,SAN FRANCISCO BAY,STINSON BEACH,37.94,-122.637,Marin Municipal Water District
 ANT,Antelope,Antelope,Indian Creek,22600,4960' ft,FEATHER R,PLUMAS,SACRAMENTO RIVER,SUSANVILLE,40.18,-120.607,CA Dept of Water Resources/O & M
 AST,Austrian,Lake Austrian,Los Gatos Creek,6200,1125' ft,LOS GATOS CR (NEAR SAN JOSE),SANTA CLARA,SAN FRANCISCO BAY,SAN JOSE,37.132,-121.93,San Jose Water Company

@@ -9,8 +9,10 @@ http://cdec.water.ca.gov/cgi-progs/current/RES
 shapefiles cor california counties:
   http://scec.usc.edu/internships/useit/content/california-counties-shapefiles
 
-historic reservoir data
-  - this business week article is also the source of the drought.xlsx file: http://www.businessweek.com/articles/2014-02-05/californias-drought-in-two-terrifying-charts
+
+historic capacity data
+
+http://cdec.water.ca.gov/cgi-progs/getMonthlyCSV?station_id
 
 
 not used in the visualization but still interesting data sources:

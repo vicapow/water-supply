@@ -25,7 +25,8 @@ function resinfo(){
       td.each(function(i, el){
         var val = $(el).text().replace(/\s+$/,'').replace(/^\s+/,'')
         var key = headers[i]
-        if(key === 'capacity (af)') val = Number(val.replace(/,/g,''))
+        if(key === 'capacity (af)')
+          key = 'capacity', val = Number(val.replace(/,/g,''))
         row[key] = val
       })
       if(row.id === 'EDS') skip = true
@@ -42,7 +43,8 @@ function resinfo(){
       })
     }, function(err, res){
       if(err) throw err
-      csv().from(res).to.stream(process.stdout, {header: true, columns: Object.keys(rows[0])})
+      csv().from(res).to
+        .stream(process.stdout, { header: true, columns: Object.keys(rows[0]) })
     })
   })
 }

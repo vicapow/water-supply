@@ -10,11 +10,19 @@ app.controller('MainCtrl', function($scope, $window, $interval){
   angular.element($window).on('resize', function(){ $scope.$apply() })
   $scope.reservoirs = []
   $scope.reservoir
+  $scope.wikify = function(stream){
+    if(!stream) return ''
+    return "https://en.wikipedia.org/wiki/" + stream.replace(/ /g,'_')
+  }
   $scope.now = 0
   var capacity_format = d3.format('.3s')
   $scope.formatCapacity = function(capacity){
     if(isNaN(capacity)) return 'NA'
     return capacity_format(capacity)
+  }
+  $scope.playButtonClicked = function(){
+    $scope.playing = !$scope.playing
+    if($scope.now === $scope.history.length - 1) $scope.now = 0
   }
   $scope.months = ['', 'January', 'February', 'March', 'April', 'May']
     .concat(['June', 'July', 'August', 'September', 'October', 'November'])
@@ -71,37 +79,39 @@ app.controller('MainCtrl', function($scope, $window, $interval){
   $scope.$watch('reservoir', function(reservoir){
     if(window._gaq) _gaq.push(['_trackEvent', 'reservoir', 'selected', reservoir.station])
   })
-  d3.csv('data/reservoirs.capacities.csv', function(row){
-    row.elev = Number(row.elev)
-    row.latitude = Number(row.latitude)
-    row.longitude = Number(row.longitude)
-    row.capacity = Number(row.capacity)
-    // convert station names to sentence case instead of all caps
-    row.station = row.station.split(' ').map(function(word){
+  function sentence_case(str){
+    return str.split(' ').map(function(word){
       return word.toLowerCase().split('').map(function(l, i){
         if(i === 0) return l.toUpperCase(); return l
       }).join('')
     }).join(' ')
+  }
+  d3.csv('data/reservoirs.csv', function(row){
+    row.elev = Number(row.elev)
+    row.latitude = Number(row.latitude)
+    row.longitude = Number(row.longitude)
+    row.capacity = Number(row.capacity)
+    row.station = row.dam
+    // convert station names to sentence case instead of all caps
+    row.station = sentence_case(row.station)
+    var city = row.nearby_city, state, sp = city.split(',')
+    city = sp[0], state = sp[1]
+    if(state) state = ', ' + state; else state = ''
+    row.nearby_city = sentence_case(city) + ' ' + state
     return row
   }, function(err, reservoirs){
     if(err) throw err
-    $scope.$apply(function(){
-      $scope.reservoirs = reservoirs
-      $scope.reservoir = reservoirs[6]
-    })
-    d3.csv('data/drought.csv', function(row, i){
+    d3.csv('data/capacities.csv', function(row, i){
       delete row[''] // get rid of this empty column property
-      row.year = Number(row.date.split('/')[1])
-      row.month = Number(row.month)
+      row.year = +row.year
+      row.month = +row.month
       var month = row.month.toString()
-      if(month.length === 1) month = '0' + month
-      row.date = row.year + '-' + month
       var obj = {} // temp object to hold reservoir data
       Object.keys(row).forEach(function(header){
         var non_reservoir_headers = ['date', 'month', 'year', '', 'capacity']
         if(non_reservoir_headers.indexOf(header) !== -1) return
         // convert to numbers and namespace the reservoirs
-        obj[header] = Number(row[header])
+        obj[header] = Number(row[header] || NaN)
         delete row[header]
       })
       row.reservoirs = obj
@@ -116,14 +126,35 @@ app.controller('MainCtrl', function($scope, $window, $interval){
       if(!$scope.$$phase) $scope.$apply(got_history)
       else got_history()
       function got_history(){
+
+        window._history = history
+        history.forEach(function(now, i){
+          var res = now.reservoirs
+          var prev = i === 0 ? res : history[i - 1].reservoirs
+          var next = i === history.length - 1 ? res : history[i + 1].reservoirs
+          Object.keys(res).forEach(function(s){
+            i = i
+            if(!isNaN(res[s])) return
+            res[s] = (prev[s] + next[s]) / 2
+            if(isNaN(res[s])) res[s] = prev[s]
+          })
+        })
+
+        // if we're missing data for feb, use jan
+        var jan = history[history.length - 2]
+        var feb = history[history.length - 1]
+        var res_ids = Object.keys(feb.reservoirs)
+        res_ids.forEach(function(id){
+          var val = feb.reservoirs[id]
+          if(val === 0) feb.reservoirs[id] = jan.reservoirs[id]
+        })
+        history = history.filter(function(d){ return d.date >= '2010-01' })
         $scope.now = 0
         $scope.playing = true
-        // just just data for the last 5 years
-        history = history.filter(function(d){ return d.year >= 2010 })
         $scope.history = history
         $scope.domain = [history[0].date, history[history.length - 1].date]
         now_change()
-        $scope.reservoirs = reservoirs
+        reservoirs = reservoirs
           .map(function(reservoir){
             // get _all_ the historic data for this reservoir
             var data = []
@@ -140,6 +171,22 @@ app.controller('MainCtrl', function($scope, $window, $interval){
             reservoir.data = data
             return reservoir
           }).filter(function(d){ return d.data.length })
+
+
+        // sort the reservoirs by capacity
+        reservoirs
+          .sort(function(a, b){ return b.capacity - a.capacity })
+
+        reservoirs = reservoirs.slice(0, 75)
+        window.reservoirs = $scope.reservoirs = reservoirs
+
+        // find the largest reservoir and select it
+        $scope.reservoir = reservoirs.reduce(function(prev, cur){
+          if(!prev || cur.capacity > prev.capacity) return cur
+          else return prev
+        }, null)
+
+
         $scope.loaded = true
         if(window._gaq) _gaq.push(['_trackEvent', 'data', 'loading', 'finish'])
       }

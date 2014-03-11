@@ -16,7 +16,7 @@ app.directive('reservoirDetail', function(){
       .y(function(d){ return y(d.value) })
 
     var graph = svg.append('g').attr('class', 'graph')
-      .attr('transform', 'translate(' + [65, 20] + ')')
+      .attr('transform', 'translate(' + [65, 10] + ')')
     var years = graph.append('g').attr('class', 'years')
 
     var xAxisG = years.append('g').attr('class', 'axis-x')
@@ -32,7 +32,7 @@ app.directive('reservoirDetail', function(){
 
     scope.$watch(function(){
       w = el.clientWidth, h = el.clientHeight
-      innerHeight = h - 100
+      innerHeight = h - 50
       return w + h
     }, resize)
     function resize(){
@@ -42,9 +42,9 @@ app.directive('reservoirDetail', function(){
       svg.selectAll('circle').data(data)
         .attr('cx', function(d){ return d[0] })
         .attr('cy', function(d){ return d[1] })
-      x.rangeRoundBands([0, 230], 0, 0), y.range([innerHeight, 0])
+      x.rangeRoundBands([0, 240], 0, 0), y.range([innerHeight, 0])
       xAxisG.call(xAxis.scale(x).innerTickSize(-innerHeight))
-        .attr('transform', 'translate(' + [0, innerHeight] + ')')
+        .attr('transform', 'translate(' + [-10, innerHeight + 2] + ')')
       yAxisG.call(yAxis.scale(y).innerTickSize(-230))
         .attr('transform', 'translate(' + [0, 0] + ')')
     }
