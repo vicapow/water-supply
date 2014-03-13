@@ -4,6 +4,7 @@ app.directive('waterMap', function(){
     var width, height
       , pi = Math.PI
       , max_r = 30
+      , format_percent = d3.format('0%')
       , generate_map_png = false
       , color = d3.scale.linear().range(['red', 'blue'])
       , png_not_canvas = true
@@ -99,6 +100,14 @@ app.directive('waterMap', function(){
           return 'translate(' +  proj([d.lon, d.lat]) + ')'
         })
     }
+    function update_label(sel){
+      var d = sel.datum()
+        , val = scope.history[scope.now].reservoirs[d.id] || 0
+        , percent = format_percent(val / d.capacity)
+      sel.selectAll('text').text(function(d){
+        return d.station + ' ' + percent
+      })
+    }
     scope.$watch(function(){ return el.clientWidth + el.clientHeight }, resize)
     scope.$watch('reservoirs', function(data){
       if(!data || !data.length) return
@@ -110,14 +119,26 @@ app.directive('waterMap', function(){
         .attr('class', 'reservoir')
         .attr('transform', function(d){
           return 'translate(' + proj([d.longitude, d.latitude]) + ')' 
-        }).append('g').attr('class', 'scale')
-      reservoir.call(set_reservoir_scale, 0)
+        })
+      var scale_g = reservoir.append('g').attr('class', 'scale')
+      scale_g.call(set_reservoir_scale, 0)
       .transition().duration(1000)
       .call(set_reservoir_scale_to_capacity)
-      reservoir.append('circle')
+      scale_g.append('circle')
         .attr('class', 'capacity')
         .attr('r', function(d){ return areaToRadius(pi) })
-      reservoir.append('circle').attr('class', 'level')
+      scale_g.append('circle').attr('class', 'level')
+      var l_g = reservoir.append('g').attr('class', 'label')
+        .style('opacity', 0)
+        .attr('transform', 'translate(' + [max_r - 5, -max_r + 5] + ')')
+
+      l_g.append('text').attr('class', 'bg')
+        .attr('x', 1).attr('y', 1)
+        .style('font-size', 10)
+      l_g.append('text').attr('class', 'fg')
+        .style('font-size', 10)
+      l_g.call(update_label)
+
       var join = clickRegions.selectAll('path').data(voronoi(data))
       join.exit().remove()
       join.enter().append('path')
@@ -151,12 +172,13 @@ app.directive('waterMap', function(){
 
     function shrink_hovered_reservoir(){
       if(!hovered_reservoir) return
-      var sel = d3.select(hovered_reservoir)
+      var sel = hovered_reservoir
       var d = sel.datum()
       if(sel.classed('selected')) return
       sel.classed('hover', false).select('.scale')
         .transition()
         .call(set_reservoir_scale, capacityScale(d.capacity))
+      sel.select('.label').transition().style('opacity', 0)
     }
 
     function set_hovered_reservoir(d){
@@ -165,8 +187,9 @@ app.directive('waterMap', function(){
       if(sel.classed('selected')) return
       sel.classed('hover', true).select('.scale')
         .transition().call(set_reservoir_scale, max_r)
+      sel.select('.label').transition().style('opacity', 1)
       // replace old hovered reservoir
-      hovered_reservoir = sel.node()
+      hovered_reservoir = sel
       // sort the reservoirs so that the hovered reservoir is on top
       reservoirs.sort(function(a, b){
         return a === d ? 1 : 0 - b === d ? 1 : 0 })
@@ -201,11 +224,7 @@ app.directive('waterMap', function(){
           var ratio = val / d.capacity
           return areaToRadius(ratio * pi)
         })
-        // .style('fill', function(d){
-        //   var val = scope.history[scope.now].reservoirs[d.id] || 0
-        //   var ratio = val / d.capacity
-        //   return color(ratio)
-        // })
+      if(hovered_reservoir) hovered_reservoir.call(update_label)
     }
 
     scope.$watch('shapefile', update_shapefile)

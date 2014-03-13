@@ -91,7 +91,7 @@ app.controller('MainCtrl', function($scope, $window, $interval){
     row.latitude = Number(row.latitude)
     row.longitude = Number(row.longitude)
     row.capacity = Number(row.capacity)
-    row.station = row.dam
+    row.station = row.lake || row.dam
     // convert station names to sentence case instead of all caps
     row.station = sentence_case(row.station)
     var city = row.nearby_city, state, sp = city.split(',')
@@ -177,7 +177,12 @@ app.controller('MainCtrl', function($scope, $window, $interval){
         reservoirs
           .sort(function(a, b){ return b.capacity - a.capacity })
 
-        reservoirs = reservoirs.slice(0, 75)
+        // exclude out of state reservoirs
+        reservoirs = reservoirs.filter(function(d){
+          return ['KLM', 'MEA', 'PWL', 'MHV', 'HVS'].indexOf(d.id) === -1
+        })
+
+        reservoirs = reservoirs.slice(0, 30)
         window.reservoirs = $scope.reservoirs = reservoirs
 
         // find the largest reservoir and select it

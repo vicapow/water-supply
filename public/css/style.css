@@ -39,12 +39,19 @@ water-map{
   display: block;
   overflow: hidden;
 }
-water-map .landmarks circle{
-  fill: rgba(0, 0, 0, 0.4);
+water-map .landmarks{
+  fill: rgba(0, 0, 0, 0.5);
 }
 water-map .landmarks text{
   font-size: 10px;
-  fill: #777;
+}
+water-map .reservoirs .label text.fg{
+  font-weight: bold;
+  fill: black;
+}
+water-map .reservoirs .label text.bg{
+  font-weight: bold;
+  fill: rgba(255, 255, 255, 0.7);
 }
 water-map .click-region{
   cursor: pointer;

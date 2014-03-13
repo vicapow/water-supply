@@ -2,11 +2,21 @@
 <html>
   <!-- for the entire project code, checkout: http://github.com/vicapow/water-supply -->
   <head>
-    <script src="js/main.min.js?t=1394520775850" charset="utf-8"></script>
-    <!-- <script src="js/angular.js" charset="utf-8"></script> -->
+    <script src="js/main.min.js?t=1394751400867" charset="utf-8"></script>
+    <!--
+    <script src="js/angular.js" charset="utf-8"></script>
+    <script src="js/d3.js" charset="utf-8"></script>
+    <script src="js/topojson.v1.js" charset="utf-8"></script>
+    <script src="js/main.js"></script>
+    <script src="js/directives/bar-chart.js"></script>
+    <script src="js/directives/water-map.js"></script>
+    <script src="js/directives/loading-dialog.js"></script>
+    <script src="js/directives/reservoir-detail.js"></script>
+    <script src="js/directives/scale-slider.js"></script>
+    -->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <title>Historic California Reservoir Capacities</title>
-    <link href="css/style.min.css?t=1394520775850" rel="stylesheet">
+    <link href="css/style.min.css?t=1394751400867" rel="stylesheet">
   </head>
   <body ng-app="myApp" ng-controller="MainCtrl" ng-clock>
     <loading-dialog ng-show="!loaded"></loading-dialog>
@@ -28,30 +38,17 @@
       <div class="detail">
         <h1 class="title"> {{reservoir.station}}</h1>
         <p>
-          storage: {{formatCapacity(history[now].reservoirs[reservoir.id])}}
+          Storage: {{formatCapacity(history[now].reservoirs[reservoir.id])}}
           <span class="acre-feet">acre-feet</span><br>
-          capacity: {{formatCapacity(reservoir.capacity)}}
+          Capacity: {{formatCapacity(reservoir.capacity)}}
           <span class="acre-feet">acre-feet</span><br>
-          river: {{reservoir.stream}}
-          <br>
-          near by city: {{reservoir.nearby_city}}
+          River: {{reservoir.stream}}
         </p>
         <reservoir-detail reservoir="reservoir" year="year" month="month">
         </reservoir-detail>
       </div>
     </div>
   </body>
-  <!--
-  <script src="js/d3.js" charset="utf-8"></script>
-  <script src="js/topojson.v1.js" charset="utf-8"></script>
-  <script src="js/main.js"></script>
-  <script src="js/directives/bar-chart.js"></script>
-  <script src="js/directives/water-map.js"></script>
-  <script src="js/directives/loading-dialog.js"></script>
-  <script src="js/directives/reservoir-detail.js"></script>
-  <script src="js/directives/scale-slider.js"></script>
--->
-
   <!-- google analytics tracking code -->
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
