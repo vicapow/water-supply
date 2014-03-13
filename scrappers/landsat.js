@@ -98,7 +98,7 @@ var bbox = {
 // Lake Cachuma
 // bbox =  {"xmin":34.50394111430936,"ymin":-120.01521851348878,"xmax":34.64867424161084,"ymax":-119.83943726348878} 
 
-bbox =  {"xmin":40.78109527549421,"ymin":-122.93140198516846,"xmax":41.04676843697316,"ymax":-122.57983948516846}
+bbox = {"xmin":39.49400829780417,"ymin":-121.54708172607423,"xmax":39.646445676297695,"ymax":-121.31224896240235}
 
 // convert to web mercator coordinate system
 bbox = {
@@ -144,16 +144,18 @@ function got_features(bbox, features){
   })
 
   var dates = []
-  // for(var i = 1999; i <= 2013; i++){
-  //   for(var j = 1; j <= 12; j++){
-  //     dates.push(new Date( '' + j + '/01/' + i + ' GMT-0800 (PST)'))
-  //   }
-  // }
+  for(var i = 1999; i <= 2013; i++){
+    for(var j = 1; j <= 12; j++){
+      dates.push(new Date( '' + j + '/01/' + i + ' GMT-0800 (PST)'))
+    }
+  }
   // dates.push(new Date('1/01/2014 GMT-0800 (PST)'))
   // dates.push(new Date('2/01/2014 GMT-0800 (PST)'))
-
-  dates.push(new Date('3/01/2013 GMT-0800 (PST)'))
-  dates.push(new Date('3/01/2014 GMT-0800 (PST)'))
+  // dates.push(new Date('3/01/2010 GMT-0800 (PST)'))
+  // dates.push(new Date('3/01/2011 GMT-0800 (PST)'))
+  // dates.push(new Date('3/01/2012 GMT-0800 (PST)'))
+  // dates.push(new Date('3/01/2013 GMT-0800 (PST)'))
+  // dates.push(new Date('3/01/2014 GMT-0800 (PST)'))
   console.log(dates)
 
   dates.map(function(date){
