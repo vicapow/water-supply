@@ -101,7 +101,7 @@ app.controller('MainCtrl', function($scope, $window, $interval){
     return row
   }, function(err, reservoirs){
     if(err) throw err
-    d3.csv('data/capacities.csv', function(row, i){
+    d3.csv('data/latest-capacities.csv', function(row, i){
       delete row[''] // get rid of this empty column property
       row.year = +row.year
       row.month = +row.month
@@ -179,10 +179,20 @@ app.controller('MainCtrl', function($scope, $window, $interval){
 
         // exclude out of state reservoirs
         reservoirs = reservoirs.filter(function(d){
-          return ['KLM', 'MEA', 'PWL', 'MHV', 'HVS'].indexOf(d.id) === -1
+          return ['KLM', 'MEA', 'PWL', 'MHV', 'HVS', 'TAH'].indexOf(d.id) === -1
         })
 
         reservoirs = reservoirs.slice(0, 30)
+        var cvp = [ 'WHI', 'SHA', 'CLE', 'FOL', 'NML', 'MIL', 'SLF', 'NAT' ]
+        var swp = [ 'ANT', 'SNL', 'BTH', 'CAS', 'SLW', 'DLV', 'FRD', 'MHV', 'LSB', 'ORO', 'PRR', 'PYM', 'QUL' ]
+        reservoirs.forEach(function(r){
+          projects = []
+          if(cvp.indexOf(r.id) !== -1) projects.push('Central Valley Project')
+          if(swp.indexOf(r.id) !== -1) projects.push('State Water Project')
+          if(projects.length === 2) r.project = 'Central Valley and State Water Projects'
+          else r.project = projects[0] || ''
+        })
+
         window.reservoirs = $scope.reservoirs = reservoirs
 
         // find the largest reservoir and select it

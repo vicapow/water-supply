@@ -53,6 +53,17 @@ water-map .reservoirs .label text.bg{
   font-weight: bold;
   fill: rgba(255, 255, 255, 0.7);
 }
+water-map .reservoir .percent{
+  opacity: 0;
+  text-anchor: middle;
+  -webkit-transition: all .25s ease-out;  /* Chrome 1-25, Safari 3.2+ */
+     -moz-transition: all .25s ease-out;  /* Firefox 4-15 */
+       -o-transition: all .25s ease-out;  /* Opera 10.50–12.00 */
+          transition: all .25s ease-out;  /* Chrome 26, Firefox 16+, IE 10+, Opera 12.10+ */
+}
+water-map .reservoir.selected:hover .percent{
+  opacity: 1;
+}
 water-map .click-region{
   cursor: pointer;
 }
@@ -106,11 +117,14 @@ input[type="range"]{
   top: 120px;
   right: -50px;
 }
-.detail .title{
+.detail .title, .detail .project{
   text-align: left;
   padding-left: 60px;
   font-size: 20px;
   margin: 0;
+}
+.detail .project{
+  font-size: 12px;
 }
 .detail p{
   text-align: left;

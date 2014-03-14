@@ -100,13 +100,12 @@ app.directive('waterMap', function(){
           return 'translate(' +  proj([d.lon, d.lat]) + ')'
         })
     }
-    function update_label(sel){
-      var d = sel.datum()
+    function update_precent_label(){
+      if(!selected_res) return
+      var sel = selected_res, d = sel.datum()
         , val = scope.history[scope.now].reservoirs[d.id] || 0
         , percent = format_percent(val / d.capacity)
-      sel.selectAll('text').text(function(d){
-        return d.station + ' ' + percent
-      })
+      sel.selectAll('text.percent').text(percent)
     }
     scope.$watch(function(){ return el.clientWidth + el.clientHeight }, resize)
     scope.$watch('reservoirs', function(data){
@@ -132,12 +131,15 @@ app.directive('waterMap', function(){
         .style('opacity', 0)
         .attr('transform', 'translate(' + [max_r - 5, -max_r + 5] + ')')
 
-      l_g.append('text').attr('class', 'bg')
+      l_g.append('text').attr('class', 'bg name')
         .attr('x', 1).attr('y', 1)
         .style('font-size', 10)
-      l_g.append('text').attr('class', 'fg')
+      l_g.append('text').attr('class', 'fg name')
         .style('font-size', 10)
-      l_g.call(update_label)
+      l_g.selectAll('text').text(function(d){ return d.station })
+
+      reservoir.append('text').attr('class', 'percent')
+        .attr('y', - max_r - 5)
 
       var join = clickRegions.selectAll('path').data(voronoi(data))
       join.exit().remove()
@@ -149,8 +151,7 @@ app.directive('waterMap', function(){
         .attr('d', function(d, i){
           if(!d) return null
           if(d.length === 0) return ''
-          // d3.geom.polygon(poly).clip(d).join('L')
-          return 'M' + d.join('L') + 'Z' 
+          return 'M' + d3.geom.polygon(poly).clip(d).join('L') + 'Z' 
         })
         .on('click', function(d, i){
           first_active = true
@@ -224,7 +225,7 @@ app.directive('waterMap', function(){
           var ratio = val / d.capacity
           return areaToRadius(ratio * pi)
         })
-      if(hovered_reservoir) hovered_reservoir.call(update_label)
+      update_precent_label()
     }
 
     scope.$watch('shapefile', update_shapefile)
@@ -253,11 +254,11 @@ app.directive('waterMap', function(){
       if(generate_map_png) window.location = map_bg.node().toDataURL("image/png")
     }
 
-    var prev_sel
+    var selected_res
     function update_selected_reservoir(d){
       if(!d) return
       var sel = d3.select(reservoir_el_given_d(d))
-      if(prev_sel && sel.node() === prev_sel.node()) return
+      if(selected_res && sel.node() === selected_res.node()) return
       var p1 = proj([d.longitude, d.latitude])
         , callout_loc = [270, 073]
         , p2 = callout_loc
@@ -269,23 +270,20 @@ app.directive('waterMap', function(){
       c[0] = c[0] / l * (l - 40), c[1] = c[1] / l * (l - 40)
       p2 = [p1[0] + c[0], p1[1] + c[1]]
       sel.classed('selected', true)
-        .transition().duration(duration).delay(!prev_sel ? 1000 : 0)
+        .transition().duration(duration).delay(!selected_res ? 1000 : 0)
         .attr('transform', 'translate(' + callout_loc + ')')
         .select('.scale').attr('transform', 'scale(' + max_r + ')')
       calloutComing.attr('d', 'M' + [p1, p1].join('L') + 'Z')
         .style('opacity', 0)
         .style('stroke-width', thick)
-        .transition().duration(duration).delay(!prev_sel ? 1000 : 0)
+        .transition().duration(duration).delay(!selected_res ? 1000 : 0)
         .attr('d', 'M' + [p1, p2].join('L') + 'Z')
         .style('opacity', 1)
         .style('stroke-width', 1)
-        .transition().duration(duration).delay((!prev_sel ? 1000 : 0) + duration)
-        .style('stroke-width', thick)
-        .attr('d', 'M' + [p2, p2].join('L') + 'Z')
-      if(!prev_sel || !prev_sel.node())
-        return prev_sel = sel, hovered_reservoir = null
+      if(!selected_res || !selected_res.node())
+        return selected_res = sel, hovered_reservoir = null
       // put away the previously selected reservoir
-      d = prev_sel.datum()
+      d = selected_res.datum()
       p1 = proj([d.longitude, d.latitude])
       p2 = callout_loc
       c = [p2[0] - p1[0], p2[1] - p1[1]]
@@ -299,12 +297,12 @@ app.directive('waterMap', function(){
         .attr('d', 'M' + [p1, p1].join('L') + 'Z')
         .style('stroke-width', thick)
         .style('opacity', 0)
-      prev_sel.classed('selected', false)
+      selected_res.classed('selected', false)
         .transition().duration(duration)
         .attr('transform', function(d){
         return 'translate(' + p1 + ')'
       }).select('.scale').call(set_reservoir_scale_to_capacity)
-      hovered_reservoir = null, prev_sel = sel
+      hovered_reservoir = null, selected_res = sel
     }
 
     function reservoir_el_given_d(d){

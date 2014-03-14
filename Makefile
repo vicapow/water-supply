@@ -28,8 +28,11 @@ public/data/counties.topojson: public/data/counties.json
 
 reservoirs: public/data/reservoirs.capacities.csv
 
-public/data/reservoirs.capacities.csv: public/data/reservoirs.csv scrappers/capacities.js
-	node scrappers/capacities.js
+public/data/latest-capacities.json: scrappers/latest-capacities.js
+	node scrappers/latest-capacities.js > public/data/latest-capacities.json
+
+public/data/latest-capacities.csv: public/data/latest-capacities.json scrappers/join-capacities-latest.js
+	node scrappers/join-capacities-latest.js > public/data/latest-capacities.csv
 
 uglifyjs:
 	uglifyjs public/js/d3.js > public/js/main.min.js

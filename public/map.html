@@ -28,6 +28,19 @@
         {{ year }} - {{ months[month] }}
       </p>
       <scale-slider domain="domain" now="sliderPosition"></scale-slider>
+      <div class="detail">
+        <h1 class="title"> {{reservoir.station}}</h1>
+        <h5 class="project">{{reservoir.project}}</h5>
+        <p>
+          Storage: {{formatCapacity(history[now].reservoirs[reservoir.id])}}
+          <span class="acre-feet">acre-feet</span><br>
+          Capacity: {{formatCapacity(reservoir.capacity)}}
+          <span class="acre-feet">acre-feet</span><br>
+          Water Source: {{reservoir.stream}}
+        </p>
+        <reservoir-detail reservoir="reservoir" year="year" month="month">
+        </reservoir-detail>
+      </div>
       <water-map
         reservoirs="reservoirs"
         history="history"
@@ -35,18 +48,6 @@
         selected-reservoir="reservoir"
         shapefile="shapefile">
       </water-map>
-      <div class="detail">
-        <h1 class="title"> {{reservoir.station}}</h1>
-        <p>
-          Storage: {{formatCapacity(history[now].reservoirs[reservoir.id])}}
-          <span class="acre-feet">acre-feet</span><br>
-          Capacity: {{formatCapacity(reservoir.capacity)}}
-          <span class="acre-feet">acre-feet</span><br>
-          River: {{reservoir.stream}}
-        </p>
-        <reservoir-detail reservoir="reservoir" year="year" month="month">
-        </reservoir-detail>
-      </div>
     </div>
   </body>
   <!-- google analytics tracking code -->
