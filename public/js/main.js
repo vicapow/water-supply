@@ -177,13 +177,16 @@ app.controller('MainCtrl', function($scope, $window, $interval){
         reservoirs
           .sort(function(a, b){ return b.capacity - a.capacity })
 
-        // exclude out of state reservoirs
+        // exclude out of state reservoirs and reservoir sensors that are
+        // sub groupings of other reservoirs (ie., SLF + LUS -> SNL)
         reservoirs = reservoirs.filter(function(d){
-          return ['KLM', 'MEA', 'PWL', 'MHV', 'HVS', 'TAH'].indexOf(d.id) === -1
+          if(['KLM', 'MEA', 'PWL', 'MHV', 'HVS', 'TAH'].indexOf(d.id) !== -1) return false
+          if(['SLF', 'LUS'].indexOf(d.id) !== -1) return false
+          return true
         })
 
         reservoirs = reservoirs.slice(0, 30)
-        var cvp = [ 'WHI', 'SHA', 'CLE', 'FOL', 'NML', 'MIL', 'SLF', 'NAT' ]
+        var cvp = [ 'WHI', 'SHA', 'CLE', 'FOL', 'NML', 'MIL', 'SNL', 'NAT' ]
         var swp = [ 'ANT', 'SNL', 'BTH', 'CAS', 'SLW', 'DLV', 'FRD', 'MHV', 'LSB', 'ORO', 'PRR', 'PYM', 'QUL' ]
         reservoirs.forEach(function(r){
           projects = []
@@ -191,6 +194,8 @@ app.controller('MainCtrl', function($scope, $window, $interval){
           if(swp.indexOf(r.id) !== -1) projects.push('State Water Project')
           if(projects.length === 2) r.project = 'Central Valley and State Water Projects'
           else r.project = projects[0] || ''
+          if(r.station === 'Lake Mcclure') r.station = 'Lake McClure'
+          if(r.station === 'Hetch-hetchy Reservoir') r.station = 'Hetch Hetchy Reservoir'
         })
 
         window.reservoirs = $scope.reservoirs = reservoirs

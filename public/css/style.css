@@ -61,6 +61,9 @@ water-map .reservoir .percent{
        -o-transition: all .25s ease-out;  /* Opera 10.50–12.00 */
           transition: all .25s ease-out;  /* Chrome 26, Firefox 16+, IE 10+, Opera 12.10+ */
 }
+water-map .reservoir .label{
+  pointer-events: none;
+}
 water-map .reservoir.selected:hover .percent{
   opacity: 1;
 }
