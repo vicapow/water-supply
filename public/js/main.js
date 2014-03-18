@@ -207,6 +207,7 @@ app.controller('MainCtrl', function($scope, $window, $interval){
           if(r.station === 'Hetch-hetchy Reservoir') r.station = 'Hetch Hetchy Reservoir'
           if(r.station === 'New Don Pedro Reservoir') r.station = 'Don Pedro Reservoir'
           if(r.station === 'Pine Flat Dam') r.station = 'Pine Flat Lake'
+          if(r.station === 'Pardee Res') r.station = 'Pardee Reservoir'
         })
 
         // normalize water source names from 
