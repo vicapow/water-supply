@@ -209,6 +209,20 @@ app.controller('MainCtrl', function($scope, $window, $interval){
           if(r.station === 'Pine Flat Dam') r.station = 'Pine Flat Lake'
         })
 
+        // normalize water source names from 
+        reservoirs.forEach(function(r){
+          if(r.station === 'Diamond Valley Lake')
+            r.stream = 'Colorado River Aqueduct'
+          if(r.station === 'Castaic Lake')
+            r.stream = 'Sacramento-San Joaquin Delta'
+          if(r.station === 'San Luis Reservoir')
+            r.stream = 'Sacramento-San Joaquin Delta'
+          if(r.station === 'Lake Casitas')
+            r.stream = 'Coyote Creek'
+          if(r.stream === 'Lake San Antonio')
+            r.stream = 'San Antonio River'
+        })
+
         window.reservoirs = $scope.reservoirs = reservoirs
 
         // find the largest reservoir and select it
