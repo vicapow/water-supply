@@ -177,6 +177,9 @@ app.controller('MainCtrl', function($scope, $window, $interval){
         reservoirs
           .sort(function(a, b){ return b.capacity - a.capacity })
 
+        var pardee = reservoirs
+          .filter(function(d){ return d.station.indexOf('Pardee') !== -1 })[0]
+
         // exclude out of state reservoirs and reservoir sensors that are
         // sub groupings of other reservoirs (ie., SLF + LUS -> SNL)
         reservoirs = reservoirs.filter(function(d){
@@ -185,17 +188,25 @@ app.controller('MainCtrl', function($scope, $window, $interval){
           return true
         })
 
+        window.original_reservoirs = reservoirs
+
         reservoirs = reservoirs.slice(0, 30)
         var cvp = [ 'WHI', 'SHA', 'CLE', 'FOL', 'NML', 'MIL', 'SNL', 'NAT' ]
         var swp = [ 'ANT', 'SNL', 'BTH', 'CAS', 'SLW', 'DLV', 'FRD', 'MHV', 'LSB', 'ORO', 'PRR', 'PYM', 'QUL' ]
+
+        reservoirs.push(pardee)
+
         reservoirs.forEach(function(r){
           projects = []
           if(cvp.indexOf(r.id) !== -1) projects.push('Central Valley Project')
           if(swp.indexOf(r.id) !== -1) projects.push('State Water Project')
           if(projects.length === 2) r.project = 'Central Valley and State Water Projects'
           else r.project = projects[0] || ''
+          // normalize station names
           if(r.station === 'Lake Mcclure') r.station = 'Lake McClure'
           if(r.station === 'Hetch-hetchy Reservoir') r.station = 'Hetch Hetchy Reservoir'
+          if(r.station === 'New Don Pedro Reservoir') r.station = 'Don Pedro Reservoir'
+          if(r.station === 'Pine Flat Dam') r.station = 'Pine Flat Lake'
         })
 
         window.reservoirs = $scope.reservoirs = reservoirs
