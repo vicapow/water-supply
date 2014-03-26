@@ -135,6 +135,14 @@ input[type="range"]{
   margin: 0;
   font-size: 12px;
 }
+.detail .produced-by{
+  float:right;
+  right: 100px;
+  font-size: 10px;
+  cursor: pointer;
+  z-index: 10000;
+  position: absolute;
+}
 reservoir-detail{
   width: 400px;
   height: 200px;

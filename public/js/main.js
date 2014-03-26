@@ -9,6 +9,8 @@ app.controller('MainCtrl', function($scope, $window, $interval){
   $scope.d3 = d3
   angular.element($window).on('resize', function(){ $scope.$apply() })
   $scope.reservoirs = []
+  var inIFrame =  (window.location !== window.parent.location)
+  $scope.atHome = inIFrame && document.referrer.indexOf('kqed.org') !== -1
   $scope.reservoir
   $scope.wikify = function(stream){
     if(!stream) return ''
@@ -182,6 +184,7 @@ app.controller('MainCtrl', function($scope, $window, $interval){
 
         // exclude out of state reservoirs and reservoir sensors that are
         // sub groupings of other reservoirs (ie., SLF + LUS -> SNL)
+        // as well as lake tahoe
         reservoirs = reservoirs.filter(function(d){
           if(['KLM', 'MEA', 'PWL', 'MHV', 'HVS', 'TAH'].indexOf(d.id) !== -1) return false
           if(['SLF', 'LUS'].indexOf(d.id) !== -1) return false
