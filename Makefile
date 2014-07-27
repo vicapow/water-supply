@@ -7,7 +7,6 @@ public/data/reservoirs.csv: scrappers/reservoirs.js
 
 shapefiles: public/data/counties.topojson
 
-
 California\ County\ Shape\ Files/: shapefiles.tar.gz
 	tar zxvf shapefiles.tar.gz
 
@@ -26,10 +25,11 @@ public/data/states.topojson: public/data/states.json
 public/data/counties.topojson: public/data/counties.json
 	topojson --ignore-shapefile-properties -o public/data/counties.topojson public/data/counties.json
 
-reservoirs: public/data/reservoirs.capacities.csv
 
 public/data/latest-capacities.json: scrappers/latest-capacities.js
 	node scrappers/latest-capacities.js > public/data/latest-capacities.json
+
+latest-capacities: public/data/latest-capacities.csv
 
 public/data/latest-capacities.csv: public/data/latest-capacities.json scrappers/join-capacities-latest.js
 	node scrappers/join-capacities-latest.js > public/data/latest-capacities.csv

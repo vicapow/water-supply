@@ -19,8 +19,8 @@ csv()
   // copy and last row and update all the values for march
   var copy = {}
   Object.keys(last_row).map(function(key){ copy[key] = last_row[key] })
-  copy.date = '2014-03'
-  copy.month = '3'
+  copy.date = '2014-07'
+  copy.month = '7'
   latest_capacities.forEach(function(cap){
     copy[cap.id] = cap.val || last_row[cap.id]
   })
