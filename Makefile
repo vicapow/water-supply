@@ -1,4 +1,4 @@
-
+DS = $(shell node -e "var t = new Date(+new Date() - 1000 * 60 * 60 * 24); console.log((t.getMonth() + 1) + '/' + t.getDate() + '/' + t.getFullYear() )")
 
 reservoirs: public/data/reservoirs.csv public/data/reservoirs.capacities.csv
 
@@ -27,12 +27,12 @@ public/data/counties.topojson: public/data/counties.json
 
 
 public/data/latest-capacities.json: scrappers/latest-capacities.js
-	node scrappers/latest-capacities.js > public/data/latest-capacities.json
+	node scrappers/latest-capacities.js $(DS) > public/data/latest-capacities.json
 
 latest-capacities: public/data/latest-capacities.csv
 
 public/data/latest-capacities.csv: public/data/latest-capacities.json scrappers/join-capacities-latest.js
-	node scrappers/join-capacities-latest.js > public/data/latest-capacities.csv
+	node scrappers/join-capacities-latest.js $(DS) > public/data/latest-capacities.csv
 
 uglifyjs:
 	uglifyjs public/js/d3.js > public/js/main.min.js
