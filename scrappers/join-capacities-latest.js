@@ -23,7 +23,6 @@ csv()
   rows.push(row)
 })
 .on('end', function(){
-  // copy and last row and update all the values for march
   var row = {}
   var isLast = false
   if (last_row.date === date[2] + '-' + date[0]) {

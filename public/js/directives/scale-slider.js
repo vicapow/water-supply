@@ -5,6 +5,7 @@ app.directive('scaleSlider', function(){
     var svg = d3.select(el).append('svg')
     var axis = d3.svg.axis()
       .innerTickSize(5)
+      .ticks(4)
       // .tickFormat(function(d, i){ return months[d.getUTCMonth()] })
     var axisG = svg.append('g')
     var progressBar = svg.append('rect').attr('class', 'progress-bar')
