@@ -26,6 +26,9 @@ precipitation data
 GIS projection reference:
 http://help.arcgis.com/en/arcgisserver/10.0/apis/rest/pcs.html
 
-to update, run:
-  update `end_date` and `dates.filter` in scrappers/capacities.js
-  run: node scrappers/capacities.js
+to update capacities.csv
+update `end_date` and `dates.filter` in scrappers/capacities.js
+then run
+
+  node scrappers/capacities.js
+

@@ -3,3 +3,4 @@ node_modules
 todo.txt
 scrappers/*.gif
 scrappers/*.jpg
+.DS_Store

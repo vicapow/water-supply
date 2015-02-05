@@ -47,7 +47,7 @@ function get_storages(){
       })
       cb(null)
     })
-  }, function(err){
+  }, function(err) {
     if(err) throw err
     var dates = Object.keys(months).sort()
     dates = dates.filter(function(d){ return d <= '2015-02' })
