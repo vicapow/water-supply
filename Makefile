@@ -27,7 +27,7 @@ public/data/counties.topojson: public/data/counties.json
 
 
 public/data/latest-capacities.json: scrappers/latest-capacities.js
-	node scrappers/latest-capacities.js $(DS) > public/data/latest-capacities.json
+	node scrappers/latest-capacities.js $(DS)
 
 latest-capacities: public/data/latest-capacities.csv
 

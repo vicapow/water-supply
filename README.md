@@ -32,3 +32,9 @@ then run
 
   node scrappers/capacities.js
 
+Next, delete public/data/latest-capacities.csv
+and public/data/latest-capacities.json
+
+Now just:
+
+make latest-capacities

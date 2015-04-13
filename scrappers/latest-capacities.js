@@ -21,11 +21,11 @@ csv()
 })
 .on('end', function(){
   async.map(reservoirs, function(reservoir, cb){
-    request.get({
-      url: 'http://cdec.water.ca.gov/cgi-progs/getDailyCSV?station_id='
+    var url = 'http://cdec.water.ca.gov/cgi-progs/getDailyCSV?station_id='
         + reservoir.id
         + '&sensor_num=15&start_date=' + date
-    }, function(err, res, body){
+    console.log('req: ', url)
+    request.get({url: url}, function(err, res, body){
       if(err) return cb(err)
       if(res.statusCode !== 200 || body.indexOf('Sorry') !== -1)
         return cb(null, '')
@@ -37,11 +37,14 @@ csv()
           // month
           row.splice(0, 4); //remove the first 4 unused values.
           var val = row[day - 1]; // zero index
+          console.log('val', val, 'for day', day)
           return cb(null, { id: reservoir.id, val: val })
         })
     })
   }, function(err, results){
     if(err) throw err
-    console.log(JSON.stringify(results.filter(function(d){ return !!d })))
+    fs.writeFileSync(__dirname + '/../public/data/latest-capacities.json',
+      JSON.stringify(results.filter(function(d){ return !!d }), null, 2)
+    )
   })
 })
